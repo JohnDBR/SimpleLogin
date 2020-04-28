@@ -3,8 +3,31 @@ import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/widgets/signin.dart';
 import 'package:login_flutter/widgets/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
+  MainPage({Key key}) : super(key: key);
+
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  bool _logged = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _retrieveLoginStatus();    
+  }
+
+  void _retrieveLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _logged = (prefs.getBool('logged') ?? false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<UserModel>(
@@ -25,7 +48,7 @@ class MainPage extends StatelessWidget {
           title: Consumer<UserModel>(
             //                  <--- Consumer
             builder: (context, userModel, child) {
-              return userModel.logged ? Text('Home') : Text('SignIn');
+              return (userModel.logged || _logged) ? Text('Home') : Text('SignIn');
             },
           ),
         ),
@@ -37,7 +60,7 @@ class MainPage extends StatelessWidget {
               child: Consumer<UserModel>(
                 //                  <--- Consumer
                 builder: (context, userModel, child) {
-                  return userModel.logged ? Home(userModel: userModel) : SignIn(userModel: userModel);
+                  return (userModel.logged || _logged) ? Home(userModel: userModel, notifyParent: _retrieveLoginStatus) : SignIn(userModel: userModel);
                 }
               )
             )

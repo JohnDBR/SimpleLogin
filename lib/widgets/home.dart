@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatelessWidget {
   final UserModel userModel;
+  final Function() notifyParent;
 
-  Home({Key key, @required this.userModel}) : super(key: key);
+  Home({Key key, @required this.userModel, @required this.notifyParent}) : super(key: key);
+
+  void _saveLoginStatus(bool logged) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('Saving logged into the shared preferences!');
+    await prefs.setBool('logged', logged);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +35,9 @@ class Home extends StatelessWidget {
               builder: (context, userModel, child) {
                 return RaisedButton(
                   onPressed: () {
+                    _saveLoginStatus(false);
                     userModel.logout();
+                    this.notifyParent();
                   },
                   child: Text('Logout'),
                 );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/widgets/signup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignIn extends StatelessWidget {
   final UserModel userModel;
@@ -25,6 +26,12 @@ class SignInFormState extends State<SignInForm> {
   final _formKey = GlobalKey<FormState>();
   String _email;
   String _password;
+
+  void _saveLoginStatus(bool logged) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('Saving logged into the shared preferences!');
+    await prefs.setBool('logged', logged);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,8 +94,11 @@ class SignInFormState extends State<SignInForm> {
                 return RaisedButton(
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
-                      //Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
                       userModel.checkLogin(_email, _password);
+                      if (userModel.logged) {
+                        _saveLoginStatus(userModel.logged);
+                        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
+                      }
                     }
                   },
                   child: Text('Submit'),
