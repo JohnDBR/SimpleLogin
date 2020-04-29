@@ -14,6 +14,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   bool _logged = false;
+  UserModel userModel = UserModel();
 
   @override
   void initState() {
@@ -25,6 +26,11 @@ class _MainPageState extends State<MainPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _logged = (prefs.getBool('logged') ?? false);
+      if (_logged) {
+        String name = (prefs.getString('name') ?? 'null');
+        String token = (prefs.getString('token') ?? 'null');
+        userModel.load(name, token, _logged);
+      }
     });
   }
 
@@ -32,7 +38,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<UserModel>(
       //      <--- ChangeNotifierProvider
-      create: (context) => UserModel(email : 'john-brs@hotmail.com', password: 'godmode01'),
+      create: (context) => userModel,
       child: _buildUi()
     );
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
-import 'package:login_flutter/screens/main_page.dart';
 
 class SignUp extends StatelessWidget {
   final UserModel userModel;
@@ -34,7 +33,36 @@ class SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
   String _email;
   String _password;
+  String _username;
+  String _name;
   String _confirmPassword;
+  bool _requesting = false;
+
+  void _ackAlert({BuildContext context, String title, String message, bool redirect = false}) async {
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('$title'),
+          content: Text('$message'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                if (redirect) {
+                  Navigator.popUntil(context, (route) {
+                    return route.settings.name == "/";
+                  });
+                } else {
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,19 +74,57 @@ class SignUpFormState extends State<SignUpForm> {
           children: <Widget>[
             TextFormField(
               decoration: const InputDecoration(
-                labelText: 'Email',
+                labelText: 'Username',
               ),
               validator: (value) {
                 if (value.isEmpty) {
-                  return 'Please enter your email';
+                  return 'Please enter your username';
                 }
                 return null;
               },
               onChanged: (value) {
                 setState(() {
-                  _email = value;
+                  _username = value;
                 });
               }
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                ),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _name = value;
+                  });
+                }
+              )
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                ),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _email = value;
+                  });
+                }
+              )
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -111,12 +177,33 @@ class SignUpFormState extends State<SignUpForm> {
                 builder: (context, userModel, child) {
                   return RaisedButton(
                     onPressed: () {
-                      if (_formKey.currentState.validate()) {
+                      if (!_requesting && _formKey.currentState.validate() && _password == _confirmPassword) {
+                        _requesting = true;
                         //Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
-                        if (_password == _confirmPassword) {
-                          debugPrint('IM HERE!');
-                          userModel.storeUsername(_email, _password);
-                        }
+                        userModel.signUpRequest(email: _email, password: _password, username: _username, name: _name)
+                        .then((user) {
+                          _requesting = false;
+                          return _ackAlert(
+                            context: context,
+                            title: 'SignUp',
+                            message: 'You have successfuly SignUp! and you are going to be redirected',
+                            redirect: true
+                          );
+                        }).catchError((error) {
+                          _requesting = false;
+                          return _ackAlert(
+                            context: context,
+                            title: 'Error',
+                            message: error.toString()
+                          );
+                        }).timeout(Duration(seconds: 10), onTimeout: () {
+                          _requesting = false;
+                          return _ackAlert(
+                            context: context,
+                            title: 'Error',
+                            message: 'Timeout > 10secs'
+                          );
+                        });
                       }
                     },
                     child: Text('Submit'),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/widgets/signup.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SignIn extends StatelessWidget {
   final UserModel userModel;
@@ -26,11 +25,29 @@ class SignInFormState extends State<SignInForm> {
   final _formKey = GlobalKey<FormState>();
   String _email;
   String _password;
+  bool _requesting = false;
 
-  void _saveLoginStatus(bool logged) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('Saving logged into the shared preferences!');
-    await prefs.setBool('logged', logged);
+  void _ackAlert({BuildContext context, String title, String message, bool redirect}) async {
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('$title'),
+          content: Text('$message'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Navigator.popUntil(context, (route) {
+                //   return route.settings.name == "/";
+                // });
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -93,12 +110,31 @@ class SignInFormState extends State<SignInForm> {
               builder: (context, userModel, child) {
                 return RaisedButton(
                   onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      userModel.checkLogin(_email, _password);
-                      if (userModel.logged) {
-                        _saveLoginStatus(userModel.logged);
-                        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
-                      }
+                    if (!_requesting && _formKey.currentState.validate()) {
+                      _requesting = true;
+                      userModel.signInRequest(email: _email, password: _password)
+                      .then((user) {
+                        _requesting = false;
+                        return _ackAlert(
+                          context: context,
+                          title: 'SignIn',
+                          message: 'You have successfuly SignIn!'
+                        );
+                      }).catchError((error) {
+                        _requesting = false;
+                        return _ackAlert(
+                          context: context,
+                          title: 'Error',
+                          message: error.toString()
+                        );
+                      }).timeout(Duration(seconds: 10), onTimeout: () {
+                        _requesting = false;
+                        return _ackAlert(
+                          context: context,
+                          title: 'Error',
+                          message: 'Timeout > 10secs'
+                        );
+                      });
                     }
                   },
                   child: Text('Submit'),
