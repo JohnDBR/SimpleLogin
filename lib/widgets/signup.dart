@@ -10,15 +10,11 @@ class SignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: new AppBar(
-        title: Text("SignUp")
-      ),
-      body: Container(
-        margin: const EdgeInsets.all(16),
-        alignment: Alignment.center,
-        child: SignUpForm()
-      )
-    );
+        appBar: new AppBar(title: Text("SignUp")),
+        body: Container(
+            margin: const EdgeInsets.all(16),
+            alignment: Alignment.center,
+            child: SignUpForm()));
   }
 }
 
@@ -38,7 +34,11 @@ class SignUpFormState extends State<SignUpForm> {
   String _confirmPassword;
   bool _requesting = false;
 
-  void _ackAlert({BuildContext context, String title, String message, bool redirect = false}) async {
+  void _ackAlert(
+      {BuildContext context,
+      String title,
+      String message,
+      bool redirect = false}) async {
     await showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -67,14 +67,15 @@ class SignUpFormState extends State<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextFormField(
+        child: Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextFormField(
               decoration: const InputDecoration(
                 labelText: 'Username',
+                border: OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value.isEmpty) {
@@ -86,133 +87,134 @@ class SignUpFormState extends State<SignUpForm> {
                 setState(() {
                   _username = value;
                 });
-              }
-            ),
-            Padding(
+              }),
+          Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                ),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _name = value;
-                  });
-                }
-              )
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                ),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _email = value;
-                  });
-                }
-              )
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: TextFormField(
-                obscureText: true,
-                decoration: const InputDecoration(
-                labelText: 'Password',
-                ),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  {
+                  decoration: const InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter your name';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
                     setState(() {
-                      _password = value;
+                      _name = value;
                     });
-                  }
-                }
-              )
-            ),
-            Padding(
+                  })),
+          Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: TextFormField(
-                obscureText: true,
-                decoration: const InputDecoration(
-                labelText: 'Confirm Password',
-                ),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  {
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
                     setState(() {
-                      _confirmPassword = value;
+                      _email = value;
                     });
-                  }
-                }
-              )
-            ),
-            Padding(
+                  })),
+          Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: TextFormField(
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    {
+                      setState(() {
+                        _password = value;
+                      });
+                    }
+                  })),
+          Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: TextFormField(
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Confirm Password',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    {
+                      setState(() {
+                        _confirmPassword = value;
+                      });
+                    }
+                  })),
+          Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Consumer<UserModel>(
-                //                  <--- Consumer
-                builder: (context, userModel, child) {
-                  return RaisedButton(
-                    onPressed: () {
-                      if (!_requesting && _formKey.currentState.validate() && _password == _confirmPassword) {
-                        _requesting = true;
-                        //Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
-                        userModel.signUpRequest(email: _email, password: _password, username: _username, name: _name)
-                        .then((user) {
-                          _requesting = false;
-                          return _ackAlert(
+                  //                  <--- Consumer
+                  builder: (context, userModel, child) {
+                return RaisedButton(
+                  onPressed: () {
+                    if (!_requesting &&
+                        _formKey.currentState.validate() &&
+                        _password == _confirmPassword) {
+                      _requesting = true;
+                      //Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
+                      userModel
+                          .signUpRequest(
+                              email: _email,
+                              password: _password,
+                              username: _username,
+                              name: _name)
+                          .then((user) {
+                        _requesting = false;
+                        return _ackAlert(
                             context: context,
                             title: 'SignUp',
-                            message: 'You have successfuly SignUp! and you are going to be redirected',
-                            redirect: true
-                          );
-                        }).catchError((error) {
-                          _requesting = false;
-                          return _ackAlert(
+                            message:
+                                'You have successfuly SignUp! and you are going to be redirected',
+                            redirect: true);
+                      }).catchError((error) {
+                        _requesting = false;
+                        return _ackAlert(
                             context: context,
                             title: 'Error',
-                            message: error.toString()
-                          );
-                        }).timeout(Duration(seconds: 10), onTimeout: () {
-                          _requesting = false;
-                          return _ackAlert(
+                            message: error.toString());
+                      }).timeout(Duration(seconds: 10), onTimeout: () {
+                        _requesting = false;
+                        return _ackAlert(
                             context: context,
                             title: 'Error',
-                            message: 'Timeout > 10secs'
-                          );
-                        });
-                      }
-                    },
-                    child: Text('Submit'),
-                  );
-                }
-              )
-            ),
-            Container(
-              alignment: Alignment.centerLeft,
+                            message: 'Timeout > 10secs');
+                      });
+                    }
+                  },
+                  child:
+                      Text('Submit', style: TextStyle(height: 1, fontSize: 25)),
+                  textColor: Colors.white,
+                  color: Colors.blue,
+                );
+              })),
+          Container(
+              alignment: Alignment.center,
               child: FlatButton(
                 onPressed: () {
                   // Navigator.push(
@@ -221,12 +223,12 @@ class SignUpFormState extends State<SignUpForm> {
                   // );
                   Navigator.pop(context);
                 },
-                child: Text('SignIn')
-              )
-            )
-          ],
-        ),
-      )
-    );
+                child:
+                    Text('Sign In!', style: TextStyle(height: 1, fontSize: 30)),
+                textColor: Colors.blue,
+              ))
+        ],
+      ),
+    ));
   }
 }

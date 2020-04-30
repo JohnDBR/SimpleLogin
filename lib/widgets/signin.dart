@@ -27,7 +27,11 @@ class SignInFormState extends State<SignInForm> {
   String _password;
   bool _requesting = false;
 
-  void _ackAlert({BuildContext context, String title, String message, bool redirect}) async {
+  void _ackAlert(
+      {BuildContext context,
+      String title,
+      String message,
+      bool redirect}) async {
     await showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -58,107 +62,105 @@ class SignInFormState extends State<SignInForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              // icon: const Padding(
-              //   padding: const EdgeInsets.only(top: 15.0),
-              //   child: const Icon(Icons.lock)
-              // )
-            ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'Please enter your email';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                _email = value;
-              });
-            }
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: TextFormField(
-              obscureText: true,
               decoration: const InputDecoration(
-              labelText: 'Password',
+                labelText: 'Email',
+                border: OutlineInputBorder(),
                 // icon: const Padding(
-                // padding: const EdgeInsets.only(top: 15.0),
-                // child: const Icon(Icons.lock)
+                //   padding: const EdgeInsets.only(top: 15.0),
+                //   child: const Icon(Icons.lock)
                 // )
               ),
               validator: (value) {
                 if (value.isEmpty) {
-                  return 'Please enter your password';
+                  return 'Please enter your email';
                 }
                 return null;
               },
               onChanged: (value) {
-                {
-                  setState(() {
-                    _password = value;
-                  });
-                }
-              }
-            ),
-          ),
+                setState(() {
+                  _email = value;
+                });
+              }),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Consumer<UserModel>(
-              //                  <--- Consumer
-              builder: (context, userModel, child) {
+            child: TextFormField(
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                  // icon: const Padding(
+                  // padding: const EdgeInsets.only(top: 15.0),
+                  // child: const Icon(Icons.lock)
+                  // )
+                ),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  {
+                    setState(() {
+                      _password = value;
+                    });
+                  }
+                }),
+          ),
+          Padding(
+              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: Consumer<UserModel>(
+                  //                  <--- Consumer
+                  builder: (context, userModel, child) {
                 return RaisedButton(
                   onPressed: () {
                     if (!_requesting && _formKey.currentState.validate()) {
                       _requesting = true;
-                      userModel.signInRequest(email: _email, password: _password)
-                      .then((user) {
+                      userModel
+                          .signInRequest(email: _email, password: _password)
+                          .then((user) {
                         _requesting = false;
                         return _ackAlert(
-                          context: context,
-                          title: 'SignIn',
-                          message: 'You have successfuly SignIn!'
-                        );
+                            context: context,
+                            title: 'SignIn',
+                            message: 'You have successfuly SignIn!');
                       }).catchError((error) {
                         _requesting = false;
                         return _ackAlert(
-                          context: context,
-                          title: 'Error',
-                          message: error.toString()
-                        );
+                            context: context,
+                            title: 'Error',
+                            message: error.toString());
                       }).timeout(Duration(seconds: 10), onTimeout: () {
                         _requesting = false;
                         return _ackAlert(
-                          context: context,
-                          title: 'Error',
-                          message: 'Timeout > 10secs'
-                        );
+                            context: context,
+                            title: 'Error',
+                            message: 'Timeout > 10secs');
                       });
                     }
                   },
                   child: Text('Submit'),
+                  textColor: Colors.white,
+                  color: Colors.blue,
                 );
-              }
-            )
-          ),
+              })),
           Container(
-            alignment: Alignment.centerLeft,
-            child: Consumer<UserModel>(
-              //                  <--- Consumer
-              builder: (context, userModel, child) {
+              alignment: Alignment.center,
+              child: Consumer<UserModel>(
+                  //                  <--- Consumer
+                  builder: (context, userModel, child) {
                 return FlatButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUp(userModel: userModel)),
+                      MaterialPageRoute(
+                          builder: (context) => SignUp(userModel: userModel)),
                     );
                   },
-                  child: Text('Do you have an account?')
+                  child: Text('No account? SignUp !'),
+                  textColor: Colors.blue,
                 );
-              }
-            )
-          )
+              }))
         ],
       ),
     );
