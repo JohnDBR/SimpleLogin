@@ -85,15 +85,12 @@ class UserModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> checkTokenRequest({String email, String password, String username, String name}) async {
+  Future<bool> checkTokenRequest({String token}) async {
     final http.Response response = await http.post(
       'https://movil-api.herokuapp.com/check/token',
       headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': email,'password': password,'username': username,'name': name
-      }),
+        'Authorization': 'Bearer $token'
+      }
     );
 
     print('${response.body}');

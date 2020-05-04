@@ -25,11 +25,32 @@ class _MainPageState extends State<MainPage> {
   void _retrieveLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _logged = (prefs.getBool('logged') ?? false);
-      if (_logged) {
+      bool lggd = (prefs.getBool('logged') ?? false);
+      if (lggd) {
         String name = (prefs.getString('name') ?? 'null');
         String token = (prefs.getString('token') ?? 'null');
-        userModel.load(name, token, _logged);
+        userModel
+          .checkTokenRequest(token: token)
+          .then((valid) {
+          if (valid) {
+            _logged = true;
+            userModel.load(name, token, _logged);
+          }
+        }).catchError((error) {
+          _logged = false;
+          // return _ackAlert(
+          //     context: context,
+          //     title: 'Error',
+          //     message: error.toString());
+        }).timeout(Duration(seconds: 10), onTimeout: () {
+          _logged = false;
+          // return _ackAlert(
+          //     context: context,
+          //     title: 'Error',
+          //     message: 'Timeout > 10secs');
+        });
+      } else {
+        _logged = false;
       }
     });
   }
