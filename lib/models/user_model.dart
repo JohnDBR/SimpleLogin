@@ -14,10 +14,15 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void load(name, token, lgged) {
+  void load(name, token, username, lgged) {
     logged = lgged;
-    userInfo = UserInfo.partialLoad(token, name);
+    userInfo = UserInfo.partialLoad(token, name, username);
     notifyListeners();
+  }
+
+  void rememberMe(String email, String password) {
+    saveEmail(email);
+    savePassword(password);
   }
 
   void login(UserInfo usrInfo) {
@@ -26,6 +31,7 @@ class UserModel extends ChangeNotifier {
     saveLoginStatus(true);
     saveToken(usrInfo.token);
     saveName(userInfo.name);
+    saveUsername(userInfo.username);
     notifyListeners();
   }
 
@@ -34,6 +40,7 @@ class UserModel extends ChangeNotifier {
     saveLoginStatus(false);
     saveToken('null');
     saveName(userInfo.name);
+    saveUsername(userInfo.username);
     notifyListeners();
   }
 
@@ -133,13 +140,31 @@ class UserModel extends ChangeNotifier {
 
   void saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('Saving logged into the shared preferences!');
+    print('Saving token into the shared preferences!');
     await prefs.setString('token', token);
   }
 
   void saveName(String name) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('Saving logged into the shared preferences!');
+    print('Saving name into the shared preferences!');
     await prefs.setString('name', name);
+  }
+
+  void saveUsername(String username) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('Saving username into the shared preferences!');
+    await prefs.setString('username', username);
+  }
+
+  void saveEmail(String email) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('Saving email into the shared preferences!');
+    await prefs.setString('email', email);
+  }
+
+  void savePassword(String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('Saving password into the shared preferences!');
+    await prefs.setString('password', password);
   }
 }

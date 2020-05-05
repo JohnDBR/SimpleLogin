@@ -29,12 +29,13 @@ class _MainPageState extends State<MainPage> {
       if (lggd) {
         String name = (prefs.getString('name') ?? 'null');
         String token = (prefs.getString('token') ?? 'null');
+        String username = (prefs.getString('username') ?? 'null');
         userModel
           .checkTokenRequest(token: token)
           .then((valid) {
           if (valid) {
             _logged = true;
-            userModel.load(name, token, _logged);
+            userModel.load(name, token, username, _logged);
           }
         }).catchError((error) {
           _logged = false;

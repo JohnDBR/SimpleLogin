@@ -14,7 +14,35 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool requesting = false;
   List<CourseInfo> courses = new List<CourseInfo>();
+
+  void _ackAlert(
+      {BuildContext context,
+      String title,
+      String message,
+      bool redirect}) async {
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('$title'),
+          content: Text('$message'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Navigator.popUntil(context, (route) {
+                //   return route.settings.name == "/";
+                // });
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,17 +58,18 @@ class _HomeState extends State<Home> {
             child:
               Column(
                 children: <Widget>[
-                  Center(
-                      child: Container(
-                          padding: EdgeInsets.only(top: 0),
-                          alignment: Alignment.topCenter,
+                  // Center(
+                  //     child:
+                       Container(
+                          // padding: EdgeInsets.only(top: 0),
+                          // alignment: Alignment.topCenter,
                           // height: 48.0,  // this restricts height, it takes the width of the parent
                           child: Consumer<UserModel>(
                               //                  <--- Consumer
                               builder: (context, userModel, child) {
                             return Text('${userModel.userInfo.name}\'s Home',
                                 style: TextStyle(height: 1, fontSize: 25));
-                          }))),
+                          })),//),
                   Consumer<UserModel>(
                       //                  <--- Consumer
                       builder: (context, userModel, child) {
@@ -55,11 +84,53 @@ class _HomeState extends State<Home> {
                       textColor: Colors.white,
                       color: Colors.blue,
                     );
-                  })
+                  }),
+                  SizedBox(
+                    height: 300,
+                    child: _list()
+                  )
                 ],
               )
           )
         )
+      ),
+      floatingActionButton: Consumer<UserModel>(
+        //                  <--- Consumer
+        builder: (context, userModel, child) {
+          return new FloatingActionButton(
+            onPressed: () { // () => _addCourseInfo(),
+              if (!requesting) {
+                requesting = true;
+                userModel
+                    .createCourse(token: userModel.userInfo.token, username: userModel.userInfo.username)
+                    .then((course) {
+                  setState(() {
+                    courses.add(course);
+                  });
+                  requesting = false;
+                  return _ackAlert(
+                    context: context,
+                    title: 'SignIn',
+                    message: 'You have successfuly created a course!');
+                }).catchError((error) {
+                  requesting = false;
+                  return _ackAlert(
+                    context: context,
+                    title: 'Error',
+                    message: error.toString());
+                }).timeout(Duration(seconds: 10), onTimeout: () {
+                  requesting = false;
+                  return _ackAlert(
+                    context: context,
+                    title: 'Error',
+                    message: 'Timeout > 10secs');
+                });
+              }
+            },
+            tooltip: 'Add course',
+            child: new Icon(Icons.add)
+          );
+        }
       )
     );
   }
@@ -172,7 +243,7 @@ class _HomeState extends State<Home> {
 
   //   if (note != null) {
   //     setState(() {
-  //       notes.add(note);
+  //       courses.add(note);
   //     });
   //   }
   // }

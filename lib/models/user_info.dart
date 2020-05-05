@@ -24,10 +24,11 @@ class UserInfo {
     );
   }
 
-  factory UserInfo.partialLoad(String token, String name) {
+  factory UserInfo.partialLoad(String token, String name, String username) {
     return UserInfo(
       token: token,
-      name: name
+      name: name,
+      username: username
     );
   }
 }
