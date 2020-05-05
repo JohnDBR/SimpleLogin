@@ -70,29 +70,11 @@ class _MainPageState extends State<MainPage> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Scaffold(
-        appBar: new AppBar(
-          title: Consumer<UserModel>(
-            //                  <--- Consumer
-            builder: (context, userModel, child) {
-              return (userModel.logged || _logged) ? Text('Home') : Text('SignIn');
-            },
-          ),
-        ),
-        body: Center(
-          child: Container(
-            margin: const EdgeInsets.all(16),
-            alignment: Alignment.center,
-            child: SingleChildScrollView(
-              child: Consumer<UserModel>(
-                //                  <--- Consumer
-                builder: (context, userModel, child) {
-                  return (userModel.logged || _logged) ? Home(userModel: userModel, notifyParent: _retrieveLoginStatus) : SignIn(userModel: userModel);
-                }
-              )
-            )
-          )
-        )
+      home: Consumer<UserModel>(
+        //                  <--- Consumer
+        builder: (context, userModel, child) {
+          return (userModel.logged || _logged) ? Home(userModel: userModel, notifyParent: _retrieveLoginStatus) : SignIn(userModel: userModel);
+        }
       )
     );
   }

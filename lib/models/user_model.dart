@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_flutter/models/course_info.dart';
 import 'package:login_flutter/models/user_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -100,6 +101,25 @@ class UserModel extends ChangeNotifier {
       return json.decode(response.body)['valid'];
     } else {
       print("Token verification failed");
+     throw Exception(response.body);
+    }
+  }
+
+  Future<CourseInfo> createCourse({String token, String username}) async {
+    final http.Response response = await http.post(
+      'https://movil-api.herokuapp.com/$username/courses',
+      headers: <String, String>{
+        'Authorization': 'Bearer $token'
+      }
+    );
+
+    print('${response.body}');
+    print('${response.statusCode}');
+    if (response.statusCode == 200) {
+      print("Course creation was done successfully");
+      return CourseInfo.fromCreate(json.decode(response.body));
+    } else {
+      print("Course creation failed");
      throw Exception(response.body);
     }
   }
