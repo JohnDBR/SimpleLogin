@@ -102,6 +102,7 @@ class _HomeState extends State<Home> {
                             widget.notifyParent();
                           });
                         },
+                        icon: Icon(Icons.power_settings_new),
                         label: Text('Logout',
                             style: TextStyle(height: 1, fontSize: 25)),
                       );
