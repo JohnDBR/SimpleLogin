@@ -131,6 +131,29 @@ class UserModel extends ChangeNotifier {
     }
   }
 
+  Future<List<CourseInfo>> getCourses({String token, String username}) async {
+    final http.Response response = await http.get(
+      'https://movil-api.herokuapp.com/$username/courses',
+      headers: <String, String>{
+        'Authorization': 'Bearer $token'
+      }
+    );
+
+    print('${response.body}');
+    print('${response.statusCode}');
+    if (response.statusCode == 200) {
+      print("Retrieving courses was done successfully");
+      List<CourseInfo> courses = List<CourseInfo>();
+      for (final course in json.decode(response.body)) {
+        courses.add(CourseInfo.fromList(course));
+      }
+      return courses;
+    } else {
+      print("Courses retrieving failed");
+     throw Exception(response.body);
+    }
+  }
+
   // Shared Preferences methods!
   void saveLoginStatus(bool logged) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

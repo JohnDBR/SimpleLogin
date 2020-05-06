@@ -24,7 +24,7 @@ class _MainPageState extends State<MainPage> {
 
   void _retrieveLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
+    setState(() { // This could be optimized!
       bool lggd = (prefs.getBool('logged') ?? false);
       if (lggd) {
         String name = (prefs.getString('name') ?? 'null');

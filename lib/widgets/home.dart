@@ -17,6 +17,38 @@ class _HomeState extends State<Home> {
   bool requesting = false;
   List<CourseInfo> courses = new List<CourseInfo>();
 
+  @override
+  void initState() {
+    super.initState();
+    _retrieveCourses();    
+  }
+
+  void _retrieveCourses() async {
+    widget.userModel
+      .getCourses(
+        token: widget.userModel.userInfo.token,
+        username: widget.userModel.userInfo.username
+      )
+      .then((listCourses) {
+        setState(() { //This could be optimized!
+          //for (final course in listCourses) {
+          //  courses.add(course);
+          //}
+          courses = listCourses;
+        });
+    }).catchError((error) {
+      // return _ackAlert(
+      //     context: context,
+      //     title: 'Error',
+      //     message: error.toString());
+    }).timeout(Duration(seconds: 10), onTimeout: () {
+      // return _ackAlert(
+      //     context: context,
+      //     title: 'Error',
+      //     message: 'Timeout to get courses > 10secs');
+    });
+  }
+
   void _ackAlert(
       {BuildContext context,
       String title,
@@ -174,9 +206,9 @@ class _HomeState extends State<Home> {
                       ),
                       onPressed: () {
                         // There is not an actual endpoint to desroy a course!...
-                        // setState(() {
-                        //   notes.removeAt(position);
-                        // });
+                        setState(() {
+                          courses.removeAt(position);
+                        });
                         Navigator.of(context).pop();
                       },
                     ),
