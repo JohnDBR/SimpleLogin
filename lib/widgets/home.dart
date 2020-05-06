@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool requesting = false;
-  List<CourseInfo> courses = new List<CourseInfo>();
+  Future<List<CourseInfo>> courses; //= new List<CourseInfo>();
 
   @override
   void initState() {
@@ -24,18 +24,18 @@ class _HomeState extends State<Home> {
   }
 
   void _retrieveCourses() async {
-    widget.userModel
+    courses = widget.userModel
       .getCourses(
         token: widget.userModel.userInfo.token,
         username: widget.userModel.userInfo.username
       )
       .then((listCourses) {
-        setState(() { //This could be optimized!
+        // setState(() { //This could be optimized!
           //for (final course in listCourses) {
           //  courses.add(course);
           //}
-          courses = listCourses;
-        });
+          return listCourses;
+        // });
     }).catchError((error) {
       // return _ackAlert(
       //     context: context,
@@ -119,7 +119,19 @@ class _HomeState extends State<Home> {
                   }),
                   SizedBox(
                     height: 300,
-                    child: _list()
+                    child: FutureBuilder<List<CourseInfo>>(
+                      future: courses,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return _list(snapshot.data);
+                        } else if (snapshot.hasError) {
+                          return Text("${snapshot.error}");
+                        }
+
+                        // By default, show a loading spinner.
+                        return CircularProgressIndicator();
+                      },
+                    )
                   )
                 ],
               )
@@ -137,7 +149,7 @@ class _HomeState extends State<Home> {
                     .createCourse(token: userModel.userInfo.token, username: userModel.userInfo.username)
                     .then((course) {
                   setState(() {
-                    courses.add(course);
+                    //courses.add(course);
                   });
                   requesting = false;
                   return _ackAlert(
@@ -167,7 +179,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _list() {
+  Widget _list(List<CourseInfo> courses) {
     return ListView.builder(
       itemCount: courses.length,
       itemBuilder: (context, position) {
@@ -207,7 +219,7 @@ class _HomeState extends State<Home> {
                       onPressed: () {
                         // There is not an actual endpoint to desroy a course!...
                         setState(() {
-                          courses.removeAt(position);
+                          // courses.data.removeAt(position);
                         });
                         Navigator.of(context).pop();
                       },
