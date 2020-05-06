@@ -28,25 +28,25 @@ class _HomeState extends State<Home> {
       .getCourses(
         token: widget.userModel.userInfo.token,
         username: widget.userModel.userInfo.username
-      )
-      .then((listCourses) {
-        // setState(() { //This could be optimized!
-          //for (final course in listCourses) {
-          //  courses.add(course);
-          //}
-          return listCourses;
-        // });
-    }).catchError((error) {
-      // return _ackAlert(
-      //     context: context,
-      //     title: 'Error',
-      //     message: error.toString());
-    }).timeout(Duration(seconds: 10), onTimeout: () {
-      // return _ackAlert(
-      //     context: context,
-      //     title: 'Error',
-      //     message: 'Timeout to get courses > 10secs');
-    });
+      );
+    //   .then((listCourses) {
+    //     // setState(() { //This could be optimized!
+    //       //for (final course in listCourses) {
+    //       //  courses.add(course);
+    //       //}
+    //       return listCourses;
+    //     // });
+    // }).catchError((error) {
+    //   // return _ackAlert(
+    //   //     context: context,
+    //   //     title: 'Error',
+    //   //     message: error.toString());
+    // }).timeout(Duration(seconds: 10), onTimeout: () {
+    //   // return _ackAlert(
+    //   //     context: context,
+    //   //     title: 'Error',
+    //   //     message: 'Timeout to get courses > 10secs');
+    // });
   }
 
   void _ackAlert(
@@ -148,14 +148,14 @@ class _HomeState extends State<Home> {
                 userModel
                     .createCourse(token: userModel.userInfo.token, username: userModel.userInfo.username)
                     .then((course) {
-                  setState(() {
-                    //courses.add(course);
-                  });
-                  requesting = false;
-                  return _ackAlert(
-                    context: context,
-                    title: 'SignIn',
-                    message: 'You have successfuly created a course!');
+                      setState(() { //This could be optimized!
+                        _retrieveCourses();
+                      });
+                      requesting = false;
+                      return _ackAlert(
+                        context: context,
+                        title: 'SignIn',
+                        message: 'You have successfuly created a course!');
                 }).catchError((error) {
                   requesting = false;
                   return _ackAlert(
@@ -189,7 +189,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _item(CourseInfo element, int position) {
+    Widget _item(CourseInfo element, int position) {
     return Dismissible(
       background: _backgroundSlide(),
       key: UniqueKey(),
