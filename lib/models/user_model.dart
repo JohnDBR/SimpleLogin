@@ -20,7 +20,8 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void rememberMe(String email, String password) {
+  void rememberMe(String email, String password, bool rememberMe) {
+    saveRememberMe(rememberMe);
     saveEmail(email);
     savePassword(password);
   }
@@ -69,7 +70,7 @@ class UserModel extends ChangeNotifier {
     }
   }
 
-  Future<UserInfo> signInRequest({String email, String password}) async {
+  Future<UserInfo> signInRequest({String email, String password, bool rmbMe}) async {
 
     final http.Response response = await http.post(
       'https://movil-api.herokuapp.com/signin',
@@ -86,6 +87,11 @@ class UserModel extends ChangeNotifier {
     if (response.statusCode == 200) {
       print("signin successful");
       login(UserInfo.fromSignUp(json.decode(response.body)));
+      if (rmbMe) {
+        rememberMe(email, password, rmbMe);
+      } else {
+        rememberMe('null', 'null', rmbMe);
+      }
       return userInfo;
     } else {
       print("signup failed");
@@ -159,6 +165,12 @@ class UserModel extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('Saving logged into the shared preferences!');
     await prefs.setBool('logged', logged);
+  }
+
+ void saveRememberMe(bool rememberMe) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('Saving rememberMe into the shared preferences!');
+    await prefs.setBool('rememberMe', rememberMe);
   }
 
   void saveToken(String token) async {

@@ -2,30 +2,55 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/widgets/signup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SignIn extends StatelessWidget {
+class SignIn extends StatefulWidget {
   final UserModel userModel;
 
   SignIn({Key key, @required this.userModel}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return SignInForm();
+  _SignInState createState() {
+    return _SignInState();
   }
 }
 
-class SignInForm extends StatefulWidget {
-  @override
-  SignInFormState createState() {
-    return SignInFormState();
-  }
-}
-
-class SignInFormState extends State<SignInForm> {
+class _SignInState extends State<SignIn> {
   final _formKey = GlobalKey<FormState>();
   String _email;
   String _password;
   bool _requesting = false;
+  bool _rememberMe = false;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _retrieveRememberMe();    
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _retrieveRememberMe() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool rmbMe = (prefs.getBool('rememberMe') ?? false);
+    if (rmbMe) {
+      String email = (prefs.getString('email') ?? 'null');
+      String password = (prefs.getString('password') ?? 'null');
+      setState(() {
+        _email = email;
+        _password = password;
+        _emailController.text = email;
+        _passwordController.text = password;
+        _rememberMe = true;
+      });
+    }
+  } 
 
   void _ackAlert(
       {BuildContext context,
@@ -71,6 +96,7 @@ class SignInFormState extends State<SignInForm> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   TextFormField(
+                      controller: _emailController,
                       decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
@@ -93,6 +119,7 @@ class SignInFormState extends State<SignInForm> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: TextFormField(
+                        controller: _passwordController,
                         obscureText: true,
                         decoration: const InputDecoration(
                           labelText: 'Password',
@@ -117,42 +144,53 @@ class SignInFormState extends State<SignInForm> {
                         }),
                   ),
                   Padding(
-                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: Consumer<UserModel>(
-                          //                  <--- Consumer
-                          builder: (context, userModel, child) {
-                        return RaisedButton(
-                          onPressed: () {
-                            if (!_requesting && _formKey.currentState.validate()) {
-                              _requesting = true;
-                              userModel
-                                  .signInRequest(email: _email, password: _password)
-                                  .then((user) {
-                                _requesting = false;
-                                return _ackAlert(
-                                    context: context,
-                                    title: 'SignIn',
-                                    message: 'You have successfuly SignIn!');
-                              }).catchError((error) {
-                                _requesting = false;
-                                return _ackAlert(
-                                    context: context,
-                                    title: 'Error',
-                                    message: error.toString());
-                              }).timeout(Duration(seconds: 10), onTimeout: () {
-                                _requesting = false;
-                                return _ackAlert(
-                                    context: context,
-                                    title: 'Error',
-                                    message: 'Timeout > 10secs');
-                              });
-                            }
-                          },
-                          child: Text('Submit'),
-                          textColor: Colors.white,
-                          color: Colors.blue,
-                        );
-                      })),
+                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: CheckboxListTile(
+                      title: Text('Remember me'),
+                      value: _rememberMe,
+                      onChanged: (value) {
+                        setState(() {
+                          _rememberMe = value;
+                        });
+                      },
+                    )
+                  ),
+                  Consumer<UserModel>(
+                      //                  <--- Consumer
+                      builder: (context, userModel, child) {
+                      return RaisedButton(
+                        onPressed: () {
+                          if (!_requesting && _formKey.currentState.validate()) {
+                            _requesting = true;
+                            userModel
+                                .signInRequest(email: _email, password: _password, rmbMe: _rememberMe)
+                                .then((user) {
+                              _requesting = false;
+                              return _ackAlert(
+                                  context: context,
+                                  title: 'SignIn',
+                                  message: 'You have successfuly SignIn!');
+                            }).catchError((error) {
+                              _requesting = false;
+                              return _ackAlert(
+                                  context: context,
+                                  title: 'Error',
+                                  message: error.toString());
+                            }).timeout(Duration(seconds: 10), onTimeout: () {
+                              _requesting = false;
+                              return _ackAlert(
+                                  context: context,
+                                  title: 'Error',
+                                  message: 'Timeout > 10secs');
+                            });
+                          }
+                        },
+                        child: Text('Submit'),
+                        textColor: Colors.white,
+                        color: Colors.blue
+                      );
+                    }
+                  ),
                   Container(
                       alignment: Alignment.center,
                       child: Consumer<UserModel>(
@@ -166,7 +204,7 @@ class SignInFormState extends State<SignInForm> {
                                   builder: (context) => SignUp(userModel: userModel)),
                             );
                           },
-                          child: Text('No account? SignUp !'),
+                          child: Text('No account? SignUp!'),
                           textColor: Colors.blue,
                         );
                       }))

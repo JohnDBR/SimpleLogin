@@ -24,36 +24,32 @@ class _MainPageState extends State<MainPage> {
 
   void _retrieveLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() { // This could be optimized!
-      bool lggd = (prefs.getBool('logged') ?? false);
-      if (lggd) {
-        String name = (prefs.getString('name') ?? 'null');
-        String token = (prefs.getString('token') ?? 'null');
-        String username = (prefs.getString('username') ?? 'null');
-        userModel
-          .checkTokenRequest(token: token)
-          .then((valid) {
-          if (valid) {
+    bool lggd = (prefs.getBool('logged') ?? false);
+    if (lggd) {
+      String name = (prefs.getString('name') ?? 'null');
+      String token = (prefs.getString('token') ?? 'null');
+      String username = (prefs.getString('username') ?? 'null');
+      userModel
+        .checkTokenRequest(token: token)
+        .then((valid) {
+        if (valid) {
+          setState(() {
             _logged = true;
             userModel.load(name, token, username, _logged);
-          }
-        }).catchError((error) {
+          });
+        }
+      }).catchError((error) {
+        setState(() {
           _logged = false;
-          // return _ackAlert(
-          //     context: context,
-          //     title: 'Error',
-          //     message: error.toString());
-        }).timeout(Duration(seconds: 10), onTimeout: () {
-          _logged = false;
-          // return _ackAlert(
-          //     context: context,
-          //     title: 'Error',
-          //     message: 'Timeout > 10secs');
         });
-      } else {
-        _logged = false;
-      }
-    });
+      }).timeout(Duration(seconds: 10), onTimeout: () {
+        setState(() {
+          _logged = false;
+        });
+      });
+    } else {
+      _logged = false;
+    }
   }
 
   @override

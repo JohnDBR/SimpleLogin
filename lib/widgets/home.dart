@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool requesting = false;
-  Future<List<CourseInfo>> courses; //= new List<CourseInfo>();
+  Future<List<CourseInfo>> courses;
 
   @override
   void initState() {
@@ -29,24 +29,6 @@ class _HomeState extends State<Home> {
         token: widget.userModel.userInfo.token,
         username: widget.userModel.userInfo.username
       );
-    //   .then((listCourses) {
-    //     // setState(() { //This could be optimized!
-    //       //for (final course in listCourses) {
-    //       //  courses.add(course);
-    //       //}
-    //       return listCourses;
-    //     // });
-    // }).catchError((error) {
-    //   // return _ackAlert(
-    //   //     context: context,
-    //   //     title: 'Error',
-    //   //     message: error.toString());
-    // }).timeout(Duration(seconds: 10), onTimeout: () {
-    //   // return _ackAlert(
-    //   //     context: context,
-    //   //     title: 'Error',
-    //   //     message: 'Timeout to get courses > 10secs');
-    // });
   }
 
   void _ackAlert(
@@ -65,9 +47,6 @@ class _HomeState extends State<Home> {
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
-                // Navigator.popUntil(context, (route) {
-                //   return route.settings.name == "/";
-                // });
               },
             ),
           ],
@@ -142,20 +121,23 @@ class _HomeState extends State<Home> {
         //                  <--- Consumer
         builder: (context, userModel, child) {
           return new FloatingActionButton(
-            onPressed: () { // () => _addCourseInfo(),
+            onPressed: () {
               if (!requesting) {
                 requesting = true;
                 userModel
                     .createCourse(token: userModel.userInfo.token, username: userModel.userInfo.username)
                     .then((course) {
-                      setState(() { //This could be optimized!
-                        _retrieveCourses();
-                      });
-                      requesting = false;
-                      return _ackAlert(
-                        context: context,
-                        title: 'SignIn',
-                        message: 'You have successfuly created a course!');
+                  setState(() {
+                    // _retrieveCourses();
+                    courses.then((list) {
+                      list.add(course);
+                    });
+                  });
+                  requesting = false;
+                  return _ackAlert(
+                    context: context,
+                    title: 'SignIn',
+                    message: 'You have successfuly created a course!');
                 }).catchError((error) {
                   requesting = false;
                   return _ackAlert(
@@ -276,19 +258,4 @@ class _HomeState extends State<Home> {
       )
     );
   }
-
-  // void _addCourseInfo() async {
-  //   final note = await showDialog<CourseInfo>(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return NewNoteDialog();
-  //     },
-  //   );
-
-  //   if (note != null) {
-  //     setState(() {
-  //       courses.add(note);
-  //     });
-  //   }
-  // }
 }
