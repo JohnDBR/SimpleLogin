@@ -7,7 +7,8 @@ class Home extends StatefulWidget {
   final UserModel userModel;
   final Function() notifyParent;
 
-  Home({Key key, @required this.userModel, @required this.notifyParent}) : super(key: key);
+  Home({Key key, @required this.userModel, @required this.notifyParent})
+      : super(key: key);
 
   @override
   _HomeState createState() => _HomeState();
@@ -20,15 +21,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _retrieveCourses();    
+    _retrieveCourses();
   }
 
   void _retrieveCourses() async {
-    courses = widget.userModel
-      .getCourses(
+    courses = widget.userModel.getCourses(
         token: widget.userModel.userInfo.token,
-        username: widget.userModel.userInfo.username
-      );
+        username: widget.userModel.userInfo.username);
   }
 
   void _ackAlert(
@@ -58,107 +57,99 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: new AppBar(
-        title: Text('Home')
-      ),
-      body: Center(
-        child: Container(
-          margin: const EdgeInsets.all(16),
-          alignment: Alignment.center,
-          child: SingleChildScrollView(
-            child:
-              Column(
-                children: <Widget>[
-                  // Center(
-                  //     child:
-                       Container(
-                          // padding: EdgeInsets.only(top: 0),
-                          // alignment: Alignment.topCenter,
-                          // height: 48.0,  // this restricts height, it takes the width of the parent
-                          child: Consumer<UserModel>(
-                              //                  <--- Consumer
-                              builder: (context, userModel, child) {
-                            return Text('${userModel.userInfo.name}\'s Home',
-                                style: TextStyle(height: 1, fontSize: 25));
-                          })),//),
-                  Consumer<UserModel>(
-                      //                  <--- Consumer
-                      builder: (context, userModel, child) {
-                    return RaisedButton(
-                      onPressed: () {
-                        userModel.logout();
-                        setState(() {
-                          widget.notifyParent();
-                        });
-                      },
-                      child: Text('Logout', style: TextStyle(height: 1, fontSize: 25)),
-                      textColor: Colors.white,
-                      color: Colors.blue,
-                    );
-                  }),
-                  SizedBox(
-                    height: 300,
-                    child: FutureBuilder<List<CourseInfo>>(
-                      future: courses,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return _list(snapshot.data);
-                        } else if (snapshot.hasError) {
-                          return Text("${snapshot.error}");
-                        }
+        appBar: new AppBar(title: Text('Home')),
+        body: Center(
+            child: Container(
+                margin: const EdgeInsets.all(0),
+                alignment: Alignment.center,
+                child: SingleChildScrollView(
+                    child: Column(
+                  children: <Widget>[
+                    // Center(
+                    //     child:
+                    Container(
+                        alignment: Alignment.topCenter,
+                        padding: const EdgeInsets.all(10),
+                        child: Consumer<UserModel>(
+                            //                  <--- Consumer
+                            builder: (context, userModel, child) {
+                          return Text('${userModel.userInfo.name}\'',
+                              style: TextStyle(height: 1, fontSize: 25));
+                        })), //),
 
-                        // By default, show a loading spinner.
-                        return CircularProgressIndicator();
-                      },
-                    )
-                  )
-                ],
-              )
-          )
-        )
-      ),
-      floatingActionButton: Consumer<UserModel>(
-        //                  <--- Consumer
-        builder: (context, userModel, child) {
+                    SizedBox(
+                        height: 420,
+                        child: FutureBuilder<List<CourseInfo>>(
+                          future: courses,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return _list(snapshot.data);
+                            } else if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+
+                            // By default, show a loading spinner.
+                            return CircularProgressIndicator();
+                          },
+                        )),
+                    Container(child: Consumer<UserModel>(
+                        //                  <--- Consumer
+                        builder: (context, userModel, child) {
+                      return FloatingActionButton.extended(
+                        onPressed: () {
+                          userModel.logout();
+                          setState(() {
+                            widget.notifyParent();
+                          });
+                        },
+                        label: Text('Logout',
+                            style: TextStyle(height: 1, fontSize: 25)),
+                      );
+                    })),
+                  ],
+                )))),
+        floatingActionButton: Consumer<UserModel>(
+
+            //                  <--- Consumer
+            builder: (context, userModel, child) {
           return new FloatingActionButton(
-            onPressed: () {
-              if (!requesting) {
-                requesting = true;
-                userModel
-                    .createCourse(token: userModel.userInfo.token, username: userModel.userInfo.username)
-                    .then((course) {
-                  setState(() {
-                    // _retrieveCourses();
-                    courses.then((list) {
-                      list.add(course);
+              onPressed: () {
+                if (!requesting) {
+                  requesting = true;
+                  userModel
+                      .createCourse(
+                          token: userModel.userInfo.token,
+                          username: userModel.userInfo.username)
+                      .then((course) {
+                    setState(() {
+                      // _retrieveCourses();
+                      courses.then((list) {
+                        list.add(course);
+                      });
                     });
+                    requesting = false;
+                    return _ackAlert(
+                        context: context,
+                        title: 'SignIn',
+                        message: 'You have successfuly created a course!');
+                  }).catchError((error) {
+                    requesting = false;
+                    return _ackAlert(
+                        context: context,
+                        title: 'Error',
+                        message: error.toString());
+                  }).timeout(Duration(seconds: 10), onTimeout: () {
+                    requesting = false;
+                    return _ackAlert(
+                        context: context,
+                        title: 'Error',
+                        message: 'Timeout > 10secs');
                   });
-                  requesting = false;
-                  return _ackAlert(
-                    context: context,
-                    title: 'SignIn',
-                    message: 'You have successfuly created a course!');
-                }).catchError((error) {
-                  requesting = false;
-                  return _ackAlert(
-                    context: context,
-                    title: 'Error',
-                    message: error.toString());
-                }).timeout(Duration(seconds: 10), onTimeout: () {
-                  requesting = false;
-                  return _ackAlert(
-                    context: context,
-                    title: 'Error',
-                    message: 'Timeout > 10secs');
-                });
-              }
-            },
-            tooltip: 'Add course',
-            child: new Icon(Icons.add)
-          );
-        }
-      )
-    );
+                }
+              },
+              tooltip: 'Add course',
+              child: new Icon(Icons.add));
+        }));
   }
 
   Widget _list(List<CourseInfo> courses) {
@@ -171,91 +162,91 @@ class _HomeState extends State<Home> {
     );
   }
 
-    Widget _item(CourseInfo element, int position) {
+  Widget _item(CourseInfo element, int position) {
     return Dismissible(
-      background: _backgroundSlide(),
-      key: UniqueKey(),
-      confirmDismiss: (direction) async {
-        if (direction == DismissDirection.startToEnd) {
-          final bool res = await showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  content: Text(
-                    "Are you sure you want to delete ${element.name}?"),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(color: Colors.black),
+        background: _backgroundSlide(),
+        key: UniqueKey(),
+        confirmDismiss: (direction) async {
+          if (direction == DismissDirection.startToEnd) {
+            final bool res = await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    content: Text(
+                        "Are you sure you want to delete ${element.name}?"),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
                       ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    FlatButton(
-                      child: Text(
-                        "Remove",
-                        style: TextStyle(color: Colors.red),
+                      FlatButton(
+                        child: Text(
+                          "Remove",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        onPressed: () {
+                          // There is not an actual endpoint to desroy a course!...
+                          setState(() {
+                            // courses.data.removeAt(position);
+                          });
+                          Navigator.of(context).pop();
+                        },
                       ),
-                      onPressed: () {
-                        // There is not an actual endpoint to desroy a course!...
-                        setState(() {
-                          // courses.data.removeAt(position);
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              });
-          return res;
-        } else {
-          // TODO: Navigate to edit page;
-        }
-      },
-      child: Card(
-        color: Colors.blueGrey,
-        child: InkWell(
-          onTap: () {
-            // print("${notes[position]} clicked");
-            // _onTap(context, element, position);
-          },
-          child: ListTile(
-            title: Text(element.name),
-            // subtitle: Text(element.body),
-          )
-        )
-      )
-    );
+                    ],
+                  );
+                });
+            return res;
+          } else {
+            // TODO: Navigate to edit page;
+          }
+        },
+        child: Card(
+            elevation: 5,
+            margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+            child: InkWell(
+                splashColor: Colors.blue.withAlpha(30),
+                onTap: () {
+                  // print("${notes[position]} clicked");
+                  // _onTap(context, element, position);
+                },
+                child: ListTile(
+                  leading: Icon(Icons.school, size: 50),
+                  title: Text(element.name),
+                  subtitle: Text(element.professor),
+                  // subtitle: Text(element.body),
+                ))));
   }
 
   Widget _backgroundSlide() {
     return Container(
-      color: Colors.red,
-      child: Align(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Icon(
-              Icons.delete,
-              color: Colors.white,
-            ),
-            Text(
-              " Delete",
-              style: TextStyle(
+        color: Colors.red,
+        child: Align(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Icon(
+                Icons.delete,
                 color: Colors.white,
-                fontWeight: FontWeight.w700,
               ),
-              textAlign: TextAlign.left,
-            ),
-            SizedBox(
-              width: 20,
-            ),
-          ],
-        ),
-        alignment: Alignment.centerRight,
-      )
-    );
+              Text(
+                " Delete",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+            ],
+          ),
+          alignment: Alignment.centerRight,
+        ));
   }
 }
