@@ -75,6 +75,21 @@ class _HomeState extends State<Home> {
                           return Text('${userModel.userInfo.name}\'s courses',
                               style: TextStyle(height: 1, fontSize: 25));
                         })), //),
+                        Consumer<UserModel>(
+                //                  <--- Consumer
+                builder: (context, userModel, child) {
+                return FloatingActionButton.extended(
+                  onPressed: () {
+                    userModel.logout();
+                    setState(() {
+                      widget.notifyParent();
+                    });
+                  },
+                  icon: Icon(Icons.power_settings_new),
+                  label: Text('Logout',
+                      style: TextStyle(height: 1, fontSize: 25)),
+                );
+              }),
                     Divider(
                       color: Colors.black,
                     ),
@@ -99,26 +114,26 @@ class _HomeState extends State<Home> {
             builder: (context, userModel, child) {
           return Stack(
             children: <Widget>[
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
-                  child: Consumer<UserModel>(
-                //                  <--- Consumer
-                builder: (context, userModel, child) {
-                return FloatingActionButton.extended(
-                  onPressed: () {
-                    userModel.logout();
-                    setState(() {
-                      widget.notifyParent();
-                    });
-                  },
-                  icon: Icon(Icons.power_settings_new),
-                  label: Text('Logout',
-                      style: TextStyle(height: 1, fontSize: 25)),
-                );
-              })
-              )),
+              // Align(
+              //   alignment: Alignment.bottomLeft,
+              //   child: Container(
+              //     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
+              //     child: Consumer<UserModel>(
+              //   //                  <--- Consumer
+              //   builder: (context, userModel, child) {
+              //   return FloatingActionButton.extended(
+              //     onPressed: () {
+              //       userModel.logout();
+              //       setState(() {
+              //         widget.notifyParent();
+              //       });
+              //     },
+              //     icon: Icon(Icons.power_settings_new),
+              //     label: Text('Logout',
+              //         style: TextStyle(height: 1, fontSize: 25)),
+              //   );
+              // })
+              // )),
               Align(
                 alignment: Alignment.bottomRight,
                 child: new FloatingActionButton(
