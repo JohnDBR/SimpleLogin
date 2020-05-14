@@ -58,27 +58,27 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: new AppBar(title: Text('Home')),
-        body: Center(
-            child: Container(
+        body: Container(
                 margin: const EdgeInsets.all(0),
-                alignment: Alignment.center,
-                child: SingleChildScrollView(
+                // alignment: Alignment.center,
+                // child: SingleChildScrollView(
                     child: Column(
                   children: <Widget>[
                     // Center(
                     //     child:
                     Container(
                         alignment: Alignment.topCenter,
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
                         child: Consumer<UserModel>(
                             //                  <--- Consumer
                             builder: (context, userModel, child) {
-                          return Text('${userModel.userInfo.name}\'',
+                          return Text('${userModel.userInfo.name}\'s courses',
                               style: TextStyle(height: 1, fontSize: 25));
                         })), //),
-
-                    SizedBox(
-                        height: 420,
+                    Divider(
+                      color: Colors.black,
+                    ),
+                    Expanded(
                         child: FutureBuilder<List<CourseInfo>>(
                           future: courses,
                           builder: (context, snapshot) {
@@ -92,69 +92,84 @@ class _HomeState extends State<Home> {
                             return CircularProgressIndicator();
                           },
                         )),
-                    Container(child: Consumer<UserModel>(
-                        //                  <--- Consumer
-                        builder: (context, userModel, child) {
-                      return FloatingActionButton.extended(
-                        onPressed: () {
-                          userModel.logout();
-                          setState(() {
-                            widget.notifyParent();
-                          });
-                        },
-                        icon: Icon(Icons.power_settings_new),
-                        label: Text('Logout',
-                            style: TextStyle(height: 1, fontSize: 25)),
-                      );
-                    })),
                   ],
-                )))),
+                )),
         floatingActionButton: Consumer<UserModel>(
-
             //                  <--- Consumer
             builder: (context, userModel, child) {
-          return new FloatingActionButton(
-              onPressed: () {
-                if (!requesting) {
-                  requesting = true;
-                  userModel
-                      .createCourse(
-                          token: userModel.userInfo.token,
-                          username: userModel.userInfo.username)
-                      .then((course) {
+          return Stack(
+            children: <Widget>[
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
+                  child: Consumer<UserModel>(
+                //                  <--- Consumer
+                builder: (context, userModel, child) {
+                return FloatingActionButton.extended(
+                  onPressed: () {
+                    userModel.logout();
                     setState(() {
-                      // _retrieveCourses();
-                      courses.then((list) {
-                        list.add(course);
-                      });
+                      widget.notifyParent();
                     });
-                    requesting = false;
-                    return _ackAlert(
-                        context: context,
-                        title: 'SignIn',
-                        message: 'You have successfuly created a course!');
-                  }).catchError((error) {
-                    requesting = false;
-                    return _ackAlert(
-                        context: context,
-                        title: 'Error',
-                        message: error.toString());
-                  }).timeout(Duration(seconds: 10), onTimeout: () {
-                    requesting = false;
-                    return _ackAlert(
-                        context: context,
-                        title: 'Error',
-                        message: 'Timeout > 10secs');
-                  });
-                }
-              },
-              tooltip: 'Add course',
-              child: new Icon(Icons.add));
+                  },
+                  icon: Icon(Icons.power_settings_new),
+                  label: Text('Logout',
+                      style: TextStyle(height: 1, fontSize: 25)),
+                );
+              })
+              )),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: new FloatingActionButton(
+                  onPressed: () {
+                    if (!requesting) {
+                      requesting = true;
+                      userModel
+                          .createCourse(
+                              token: userModel.userInfo.token,
+                              username: userModel.userInfo.username)
+                          .then((course) {
+                              // setState(() {
+                              // _retrieveCourses();
+                              // });
+                            courses.then((list) {
+                              setState(() {
+                                list.add(course);
+                              });
+                            });
+                        requesting = false;
+                        return _ackAlert(
+                            context: context,
+                            title: 'SignIn',
+                            message: 'You have successfuly created a course!');
+                      }).catchError((error) {
+                        requesting = false;
+                        return _ackAlert(
+                            context: context,
+                            title: 'Error',
+                            message: error.toString());
+                      }).timeout(Duration(seconds: 10), onTimeout: () {
+                        requesting = false;
+                        return _ackAlert(
+                            context: context,
+                            title: 'Error',
+                            message: 'Timeout > 10secs');
+                      });
+                    }
+                  },
+                  tooltip: 'Add course',
+                  child: new Icon(Icons.add)
+                )
+              ),
+            ],
+          );
         }));
   }
 
   Widget _list(List<CourseInfo> courses) {
     return ListView.builder(
+      padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
       itemCount: courses.length,
       itemBuilder: (context, position) {
         var element = courses[position];

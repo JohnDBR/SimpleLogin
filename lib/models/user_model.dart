@@ -66,7 +66,7 @@ class UserModel extends ChangeNotifier {
       return userInfo;
     } else {
       print("signup failed");
-     throw Exception(response.body);
+      throw Exception(response.body);
     }
   }
 
@@ -114,6 +114,7 @@ class UserModel extends ChangeNotifier {
       return json.decode(response.body)['valid'];
     } else {
       print("Token verification failed");
+      logout();
      throw Exception(response.body);
     }
   }
@@ -133,7 +134,8 @@ class UserModel extends ChangeNotifier {
       return CourseInfo.fromCreate(json.decode(response.body));
     } else {
       print("Course creation failed");
-     throw Exception(response.body);
+      tokenTimeout(json.decode(response.body)['error']);
+      throw Exception(response.body);
     }
   }
 
@@ -156,7 +158,15 @@ class UserModel extends ChangeNotifier {
       return courses;
     } else {
       print("Courses retrieving failed");
-     throw Exception(response.body);
+      tokenTimeout(json.decode(response.body)['error']);
+      throw Exception(response.body);
+    }
+  }
+
+  // Error handler methods!
+  void tokenTimeout(String error) {
+    if (error == 'Token inválido.') {
+      logout();
     }
   }
 
@@ -167,7 +177,7 @@ class UserModel extends ChangeNotifier {
     await prefs.setBool('logged', logged);
   }
 
- void saveRememberMe(bool rememberMe) async {
+  void saveRememberMe(bool rememberMe) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('Saving rememberMe into the shared preferences!');
     await prefs.setBool('rememberMe', rememberMe);
