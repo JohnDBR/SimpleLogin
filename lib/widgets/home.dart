@@ -66,30 +66,36 @@ class _HomeState extends State<Home> {
                   children: <Widget>[
                     // Center(
                     //     child:
-                    Container(
+                    Row(
+                      children: <Widget>[
+                        Container(
                         alignment: Alignment.topCenter,
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 5),
                         child: Consumer<UserModel>(
                             //                  <--- Consumer
                             builder: (context, userModel, child) {
                           return Text('${userModel.userInfo.name}\'s courses',
-                              style: TextStyle(height: 1, fontSize: 25));
+                              style: TextStyle(height: 1, fontSize: 15));
                         })), //),
-                        Consumer<UserModel>(
-                //                  <--- Consumer
-                builder: (context, userModel, child) {
-                return FloatingActionButton.extended(
-                  onPressed: () {
-                    userModel.logout();
-                    setState(() {
-                      widget.notifyParent();
-                    });
-                  },
-                  icon: Icon(Icons.power_settings_new),
-                  label: Text('Logout',
-                      style: TextStyle(height: 1, fontSize: 25)),
-                );
-              }),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                        child: Consumer<UserModel>(
+                        //                  <--- Consumer
+                        builder: (context, userModel, child) {
+                        return FloatingActionButton.extended(
+                          onPressed: () {
+                            userModel.logout();
+                            setState(() {
+                              widget.notifyParent();
+                            });
+                          },
+                          icon: Icon(Icons.power_settings_new),
+                          label: Text('Logout',
+                              style: TextStyle(height: 1, fontSize: 15)),
+                        );
+                      }),)
+                      ],
+                    ),
                     Divider(
                       color: Colors.black,
                     ),
