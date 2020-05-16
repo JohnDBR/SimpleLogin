@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:login_flutter/models/course_info.dart';
 import 'package:login_flutter/models/user_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 class UserModel extends ChangeNotifier {
   UserInfo userInfo;
@@ -14,7 +11,12 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void load(name, token, username, lgged) {
+  Future loadSession() async {
+    List result = await retrieveLoginStatus();
+    loadUser(result[1], result[2], result[3], result[0]);
+  }
+
+  void loadUser(name, token, username, lgged) {
     logged = lgged;
     userInfo = UserInfo.partialLoad(token, name, username);
     notifyListeners();
@@ -43,124 +45,6 @@ class UserModel extends ChangeNotifier {
     saveName(userInfo.name);
     saveUsername(userInfo.username);
     notifyListeners();
-  }
-
-  // HTTP methods!
-  Future<UserInfo> signUpRequest({String email, String password, String username, String name}) async {
-
-    final http.Response response = await http.post(
-      'https://movil-api.herokuapp.com/signup',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': email,'password': password,'username': username,'name': name
-      }),
-    );
-
-    print('${response.body}');
-    print('${response.statusCode}');
-    if (response.statusCode == 200) {
-      print("signup successful");
-      login(UserInfo.fromSignUp(json.decode(response.body)));
-      return userInfo;
-    } else {
-      print("signup failed");
-      throw Exception(response.body);
-    }
-  }
-
-  Future<UserInfo> signInRequest({String email, String password, bool rmbMe}) async {
-
-    final http.Response response = await http.post(
-      'https://movil-api.herokuapp.com/signin',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': email,'password': password
-      }),
-    );
-
-    print('${response.body}');
-    print('${response.statusCode}');
-    if (response.statusCode == 200) {
-      print("signin successful");
-      login(UserInfo.fromSignUp(json.decode(response.body)));
-      if (rmbMe) {
-        rememberMe(email, password, rmbMe);
-      } else {
-        rememberMe('null', 'null', rmbMe);
-      }
-      return userInfo;
-    } else {
-      print("signup failed");
-     throw Exception(response.body);
-    }
-  }
-
-  Future<bool> checkTokenRequest({String token}) async {
-    final http.Response response = await http.post(
-      'https://movil-api.herokuapp.com/check/token',
-      headers: <String, String>{
-        'Authorization': 'Bearer $token'
-      }
-    );
-
-    print('${response.body}');
-    print('${response.statusCode}');
-    if (response.statusCode == 200) {
-      print("Token verification was done successfully");
-      return json.decode(response.body)['valid'];
-    } else {
-      print("Token verification failed");
-      logout();
-     throw Exception(response.body);
-    }
-  }
-
-  Future<CourseInfo> createCourse({String token, String username}) async {
-    final http.Response response = await http.post(
-      'https://movil-api.herokuapp.com/$username/courses',
-      headers: <String, String>{
-        'Authorization': 'Bearer $token'
-      }
-    );
-
-    print('${response.body}');
-    print('${response.statusCode}');
-    if (response.statusCode == 200) {
-      print("Course creation was done successfully");
-      return CourseInfo.fromCreate(json.decode(response.body));
-    } else {
-      print("Course creation failed");
-      tokenTimeout(json.decode(response.body)['error']);
-      throw Exception(response.body);
-    }
-  }
-
-  Future<List<CourseInfo>> getCourses({String token, String username}) async {
-    final http.Response response = await http.get(
-      'https://movil-api.herokuapp.com/$username/courses',
-      headers: <String, String>{
-        'Authorization': 'Bearer $token'
-      }
-    );
-
-    print('${response.body}');
-    print('${response.statusCode}');
-    if (response.statusCode == 200) {
-      print("Retrieving courses was done successfully");
-      List<CourseInfo> courses = List<CourseInfo>();
-      for (final course in json.decode(response.body)) {
-        courses.add(CourseInfo.fromList(course));
-      }
-      return courses;
-    } else {
-      print("Courses retrieving failed");
-      tokenTimeout(json.decode(response.body)['error']);
-      throw Exception(response.body);
-    }
   }
 
   // Error handler methods!
@@ -212,4 +96,27 @@ class UserModel extends ChangeNotifier {
     print('Saving password into the shared preferences!');
     await prefs.setString('password', password);
   }
+
+  Future<List> retrieveRememberMe() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool rmbMe = (prefs.getBool('rememberMe') ?? false);
+    if (rmbMe) {
+      String email = (prefs.getString('email') ?? 'null');
+      String password = (prefs.getString('password') ?? 'null');
+      return [email, password, true];
+    }
+    return ['null', 'null', false];
+  } 
+
+  Future<List> retrieveLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool lggd = (prefs.getBool('logged') ?? false);
+    if (lggd) {
+      String name = (prefs.getString('name') ?? 'null');
+      String token = (prefs.getString('token') ?? 'null');
+      String username = (prefs.getString('username') ?? 'null');
+      return [true, name, token, username];
+    }
+    return [false, 'null', 'null', 'null'];
+  }  
 }

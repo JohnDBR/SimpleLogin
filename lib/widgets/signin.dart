@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:login_flutter/base/base_model.dart';
+import 'package:login_flutter/base/base_view.dart';
+import 'package:login_flutter/viewmodels/signin_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/widgets/signup.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class SignIn extends StatefulWidget {
   final UserModel userModel;
@@ -37,16 +41,13 @@ class _SignInState extends State<SignIn> {
   }
 
   void _retrieveRememberMe() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool rmbMe = (prefs.getBool('rememberMe') ?? false);
-    if (rmbMe) {
-      String email = (prefs.getString('email') ?? 'null');
-      String password = (prefs.getString('password') ?? 'null');
+    List result = await widget.userModel.retrieveRememberMe();
+    if (result[2]) {
       setState(() {
-        _email = email;
-        _password = password;
-        _emailController.text = email;
-        _passwordController.text = password;
+        _email = result[0];
+        _password = result[1];
+        _emailController.text = result[0];
+        _passwordController.text = result[1];
         _rememberMe = true;
       });
     }
@@ -81,11 +82,15 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BaseView<SignInViewModel>(
+      builder: (context, model, child) => Scaffold(
+      key: _scaffoldKey,
       appBar: new AppBar(
         title: Text('SignIn'),
       ),
-      body: Center(
+      body: model.state == ViewState.Busy
+        ? Center(child: CircularProgressIndicator())
+        : Center(
         child: Container(
           margin: const EdgeInsets.all(16),
           alignment: Alignment.center,
@@ -100,10 +105,6 @@ class _SignInState extends State<SignIn> {
                       decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
-                        // icon: const Padding(
-                        //   padding: const EdgeInsets.only(top: 15.0),
-                        //   child: const Icon(Icons.lock)
-                        // )
                       ),
                       validator: (value) {
                         if (value.isEmpty) {
@@ -124,10 +125,6 @@ class _SignInState extends State<SignIn> {
                         decoration: const InputDecoration(
                           labelText: 'Password',
                           border: OutlineInputBorder(),
-                          // icon: const Padding(
-                          // padding: const EdgeInsets.only(top: 15.0),
-                          // child: const Icon(Icons.lock)
-                          // )
                         ),
                         validator: (value) {
                           if (value.isEmpty) {
@@ -155,41 +152,40 @@ class _SignInState extends State<SignIn> {
                       },
                     )
                   ),
-                  Consumer<UserModel>(
-                      //                  <--- Consumer
-                      builder: (context, userModel, child) {
-                      return RaisedButton(
+                  RaisedButton(
                         onPressed: () {
                           if (!_requesting && _formKey.currentState.validate()) {
                             _requesting = true;
-                            userModel
-                                .signInRequest(email: _email, password: _password, rmbMe: _rememberMe)
-                                .then((user) {
-                              _requesting = false;
-                              return _ackAlert(
-                                  context: context,
-                                  title: 'SignIn',
-                                  message: 'You have successfuly SignIn!');
-                            }).catchError((error) {
-                              _requesting = false;
-                              return _ackAlert(
-                                  context: context,
+                            model.signIn(
+                              email: _email,
+                              password: _password,
+                              resultFunction: () {
+                                _requesting = false;
+                                return _ackAlert(
+                                    context: _scaffoldKey.currentContext,
+                                    title: 'SignIn',
+                                    message: 'You have successfuly SignIn!');
+                              },
+                              errorFunction: (error) {
+                                _requesting = false;
+                                return _ackAlert(
+                                  context: _scaffoldKey.currentContext,
                                   title: 'Error',
                                   message: error.toString());
-                            }).timeout(Duration(seconds: 10), onTimeout: () {
-                              _requesting = false;
-                              return _ackAlert(
-                                  context: context,
+                              },
+                              timeoutFunction: () {
+                                _requesting = false;
+                                return _ackAlert(
+                                  context: _scaffoldKey.currentContext,
                                   title: 'Error',
                                   message: 'Timeout > 10secs');
-                            });
+                              }
+                          );
                           }
                         },
                         child: Text('Submit'),
                         textColor: Colors.white,
                         color: Colors.blue
-                      );
-                    }
                   ),
                   Container(
                       alignment: Alignment.center,
@@ -214,6 +210,6 @@ class _SignInState extends State<SignIn> {
           )
         )
       )
-    );
+    ));
   }
 }

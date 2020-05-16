@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:login_flutter/base/base_model.dart';
+import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/models/course_info.dart';
+import 'package:login_flutter/viewmodels/home_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
 
@@ -17,18 +20,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool requesting = false;
   Future<List<CourseInfo>> courses;
-
-  @override
-  void initState() {
-    super.initState();
-    _retrieveCourses();
-  }
-
-  void _retrieveCourses() async {
-    courses = widget.userModel.getCourses(
-        token: widget.userModel.userInfo.token,
-        username: widget.userModel.userInfo.username);
-  }
 
   void _ackAlert(
       {BuildContext context,
@@ -56,46 +47,28 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BaseView<HomeViewModel>(
+        onModelReady: (model) { 
+          courses = model.getCourses(
+            username: widget.userModel.userInfo.username, // Provider.of<UserModel>(context).userInfo.username,
+            token: widget.userModel.userInfo.token // Provider.of<UserModel>(context).userInfo.token
+          );
+        },
+        builder: (context, model, child) => Scaffold(
         appBar: new AppBar(title: Text('Home')),
-        body: Container(
+        body: model.state == ViewState.Busy
+                ? Center(child: CircularProgressIndicator())
+                : Container(
                 margin: const EdgeInsets.all(0),
-                // alignment: Alignment.center,
-                // child: SingleChildScrollView(
                     child: Column(
                   children: <Widget>[
-                    // Center(
-                    //     child:
-                    Row(
-                      children: <Widget>[
-                        Container(
+                    Container(
                         alignment: Alignment.topCenter,
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 5),
-                        child: Consumer<UserModel>(
-                            //                  <--- Consumer
-                            builder: (context, userModel, child) {
-                          return Text('${userModel.userInfo.name}\'s courses',
-                              style: TextStyle(height: 1, fontSize: 15));
-                        })), //),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                        child: Consumer<UserModel>(
-                        //                  <--- Consumer
-                        builder: (context, userModel, child) {
-                        return FloatingActionButton.extended(
-                          onPressed: () {
-                            userModel.logout();
-                            setState(() {
-                              widget.notifyParent();
-                            });
-                          },
-                          icon: Icon(Icons.power_settings_new),
-                          label: Text('Logout',
-                              style: TextStyle(height: 1, fontSize: 15)),
-                        );
-                      }),)
-                      ],
-                    ),
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        child: Text(
+                          '${widget.userModel.userInfo.name}\'s courses',
+                          style: TextStyle(height: 1, fontSize: 25))
+                        ),
                     Divider(
                       color: Colors.black,
                     ),
@@ -110,7 +83,7 @@ class _HomeState extends State<Home> {
                             }
 
                             // By default, show a loading spinner.
-                            return CircularProgressIndicator();
+                            // return CircularProgressIndicator();
                           },
                         )),
                   ],
@@ -120,63 +93,65 @@ class _HomeState extends State<Home> {
             builder: (context, userModel, child) {
           return Stack(
             children: <Widget>[
-              // Align(
-              //   alignment: Alignment.bottomLeft,
-              //   child: Container(
-              //     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
-              //     child: Consumer<UserModel>(
-              //   //                  <--- Consumer
-              //   builder: (context, userModel, child) {
-              //   return FloatingActionButton.extended(
-              //     onPressed: () {
-              //       userModel.logout();
-              //       setState(() {
-              //         widget.notifyParent();
-              //       });
-              //     },
-              //     icon: Icon(Icons.power_settings_new),
-              //     label: Text('Logout',
-              //         style: TextStyle(height: 1, fontSize: 25)),
-              //   );
-              // })
-              // )),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
+                  child: Consumer<UserModel>(
+                //                  <--- Consumer
+                builder: (context, userModel, child) {
+                return FloatingActionButton.extended(
+                  onPressed: () {
+                    userModel.logout();
+                    setState(() {
+                      widget.notifyParent();
+                    });
+                  },
+                  icon: Icon(Icons.power_settings_new),
+                  label: Text('Logout',
+                      style: TextStyle(height: 1, fontSize: 25)),
+                );
+              })
+              )),
               Align(
                 alignment: Alignment.bottomRight,
                 child: new FloatingActionButton(
                   onPressed: () {
                     if (!requesting) {
                       requesting = true;
-                      userModel
-                          .createCourse(
-                              token: userModel.userInfo.token,
-                              username: userModel.userInfo.username)
-                          .then((course) {
-                              // setState(() {
-                              // _retrieveCourses();
-                              // });
-                            courses.then((list) {
-                              setState(() {
-                                list.add(course);
-                              });
-                            });
-                        requesting = false;
-                        return _ackAlert(
+                      model.addCourse(
+                        username: Provider.of<UserModel>(context).userInfo.username,
+                        token: Provider.of<UserModel>(context).userInfo.token,
+                        resultFunction: (val) {
+                            // setState(() {
+                            // _retrieveCourses();
+                            // });
+                            // courses.then((list) {
+                            //   setState(() {
+                            //     list.add(course);
+                            //   });
+                            // });
+                          requesting = false;
+                          return _ackAlert(
                             context: context,
                             title: 'SignIn',
                             message: 'You have successfuly created a course!');
-                      }).catchError((error) {
-                        requesting = false;
-                        return _ackAlert(
+                        },
+                        errorFunction: (error) {
+                          requesting = false;
+                          return _ackAlert(
                             context: context,
                             title: 'Error',
                             message: error.toString());
-                      }).timeout(Duration(seconds: 10), onTimeout: () {
-                        requesting = false;
-                        return _ackAlert(
+                        },
+                        timeoutFunction: () {
+                          requesting = false;
+                          return _ackAlert(
                             context: context,
                             title: 'Error',
                             message: 'Timeout > 10secs');
-                      });
+                        }
+                      );
                     }
                   },
                   tooltip: 'Add course',
@@ -185,7 +160,7 @@ class _HomeState extends State<Home> {
               ),
             ],
           );
-        }));
+        })));
   }
 
   Widget _list(List<CourseInfo> courses) {
@@ -255,7 +230,6 @@ class _HomeState extends State<Home> {
                   leading: Icon(Icons.school, size: 50),
                   title: Text(element.name),
                   subtitle: Text(element.professor),
-                  // subtitle: Text(element.body),
                 ))));
   }
 
