@@ -15,6 +15,7 @@ class AuthService {
     // _password = password;
     try {
       user = await _api.signInRequest(email: email, password: password);
+      tokenStatus = true;
     } catch (err) {
       print('service signInRequest ${err.toString()}');
       return Future.error(err.toString());

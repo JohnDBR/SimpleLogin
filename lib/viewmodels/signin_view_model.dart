@@ -6,6 +6,7 @@ import '../locator.dart';
 class SignInViewModel extends BaseModel {
   final AuthService _authenticationService = locator<AuthService>();
   UserInfo get user => _authenticationService.user;
+  bool get tokenStatus => _authenticationService.tokenStatus;
  
   Future signIn({
     String email,

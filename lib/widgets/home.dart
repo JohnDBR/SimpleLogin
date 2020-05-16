@@ -49,9 +49,14 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return BaseView<HomeViewModel>(
         onModelReady: (model) { 
-          courses = model.getCourses(
+          model.getCourses(
             username: widget.userModel.userInfo.username, // Provider.of<UserModel>(context).userInfo.username,
-            token: widget.userModel.userInfo.token // Provider.of<UserModel>(context).userInfo.token
+            token: widget.userModel.userInfo.token, // Provider.of<UserModel>(context).userInfo.token
+            resultFunction: (val) {
+              courses.then((value) {
+                value = model.courses;
+              });
+            }
           );
         },
         builder: (context, model, child) => Scaffold(

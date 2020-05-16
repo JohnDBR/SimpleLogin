@@ -10,8 +10,9 @@ final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class SignIn extends StatefulWidget {
   final UserModel userModel;
+  final Function() notifyParent;
 
-  SignIn({Key key, @required this.userModel}) : super(key: key);
+  SignIn({Key key, @required this.userModel, @required this.notifyParent}) : super(key: key);
 
   _SignInState createState() {
     return _SignInState();
@@ -161,6 +162,13 @@ class _SignInState extends State<SignIn> {
                               password: _password,
                               resultFunction: () {
                                 _requesting = false;
+                                widget.userModel.login(model.user);
+                                if (_rememberMe) {
+                                  widget.userModel.rememberMe(_email, _password, true);
+                                } else {
+                                  widget.userModel.rememberMe('null', 'null', false);
+                                }
+                                widget.notifyParent();
                                 return _ackAlert(
                                     context: _scaffoldKey.currentContext,
                                     title: 'SignIn',
