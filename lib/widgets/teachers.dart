@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
-import 'package:login_flutter/models/course_info.dart';
-import 'package:login_flutter/viewmodels/home_view_model.dart';
-import 'package:provider/provider.dart';
+import 'package:login_flutter/models/teacher_info.dart';
 import 'package:login_flutter/models/user_model.dart';
-
-import 'drawer_menu.dart';
+import 'package:login_flutter/viewmodels/teachers_view_model.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class Home extends StatefulWidget {
+class Teachers extends StatefulWidget {
   final UserModel userModel;
   final Function() notifyParent;
 
-  Home({Key key, @required this.userModel, @required this.notifyParent})
+  Teachers({Key key, @required this.userModel, @required this.notifyParent})
       : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _StudentsState createState() => _StudentsState();
 }
 
-class _HomeState extends State<Home> {
+class _StudentsState extends State<Teachers> {
   bool requesting = false;
-  Future<List<CourseInfo>> courses;
+  Future<List<TeacherInfo>> teachers;
 
   void _ackAlert(
       {BuildContext context,
@@ -51,13 +48,13 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<HomeViewModel>(
+    return BaseView<TeachersViewModel>(
         onModelReady: (model) { 
-          model.getCourses(
+          model.getTeachers(
             username: widget.userModel.userInfo.username,
             token: widget.userModel.userInfo.token,
             resultFunction: (val) {
-              courses = Future.value(model.courses);
+              teachers = Future.value(model.teachers);
             },
             errorFunction: (error) {
               return _ackAlert(
@@ -93,8 +90,8 @@ class _HomeState extends State<Home> {
                       color: Colors.black,
                     ),
                     Expanded(
-                        child: FutureBuilder<List<CourseInfo>>(
-                          future: courses,
+                        child: FutureBuilder<List<TeacherInfo>>(
+                          future: teachers,
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return _list(snapshot.data);
@@ -144,12 +141,12 @@ class _HomeState extends State<Home> {
                     if (!requesting) {
                       requesting = true;
                       debugPrint("HOLAAAAA");
-                      model.addCourse(
+                      model.addTeacher(
                         username: widget.userModel.userInfo.username,
                         token: widget.userModel.userInfo.token,
                         resultFunction: (val) {
                           setState(() {
-                            courses = Future.value(model.courses);
+                            teacher = Future.value(model.teachers);
                           });
                           requesting = false;
                           return _ackAlert(
@@ -185,7 +182,7 @@ class _HomeState extends State<Home> {
         })));
   }
 
-  Widget _list(List<CourseInfo> courses) {
+  Widget _list(List<TeacherInfo> courses) {
     return courses.isEmpty ? Center(child: Text('There are no courses available yet!')
       ) : ListView.builder(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
@@ -197,7 +194,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _item(CourseInfo element, int position) {
+  Widget _item(TeacherInfo element, int position) {
     return Dismissible(
         background: _backgroundSlide(),
         key: UniqueKey(),

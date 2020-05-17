@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
-import 'package:login_flutter/models/course_info.dart';
-import 'package:login_flutter/viewmodels/home_view_model.dart';
-import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
+import 'package:login_flutter/viewmodels/students_view_model.dart';
 
 import 'drawer_menu.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class Home extends StatefulWidget {
+class Students extends StatefulWidget {
   final UserModel userModel;
   final Function() notifyParent;
 
-  Home({Key key, @required this.userModel, @required this.notifyParent})
+  Students({Key key, @required this.userModel, @required this.notifyParent})
       : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _StudentsState createState() => _StudentsState();
 }
 
-class _HomeState extends State<Home> {
+class _StudentsState extends State<Students> {
   bool requesting = false;
-  Future<List<CourseInfo>> courses;
+  Future<List<StudentInfo>> students;
 
   void _ackAlert(
       {BuildContext context,
@@ -51,13 +49,13 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<HomeViewModel>(
+    return BaseView<StudentsViewModel>(
         onModelReady: (model) { 
-          model.getCourses(
+          model.getStudents(
             username: widget.userModel.userInfo.username,
             token: widget.userModel.userInfo.token,
             resultFunction: (val) {
-              courses = Future.value(model.courses);
+              students = Future.value(model.students);
             },
             errorFunction: (error) {
               return _ackAlert(
@@ -93,8 +91,8 @@ class _HomeState extends State<Home> {
                       color: Colors.black,
                     ),
                     Expanded(
-                        child: FutureBuilder<List<CourseInfo>>(
-                          future: courses,
+                        child: FutureBuilder<List<StudentInfo>>(
+                          future: students,
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return _list(snapshot.data);
@@ -143,13 +141,12 @@ class _HomeState extends State<Home> {
                   onPressed: () {
                     if (!requesting) {
                       requesting = true;
-                      debugPrint("HOLAAAAA");
-                      model.addCourse(
+                      model.addStudent(
                         username: widget.userModel.userInfo.username,
                         token: widget.userModel.userInfo.token,
                         resultFunction: (val) {
                           setState(() {
-                            courses = Future.value(model.courses);
+                            students = Future.value(model.students);
                           });
                           requesting = false;
                           return _ackAlert(
@@ -158,7 +155,6 @@ class _HomeState extends State<Home> {
                             message: 'You have successfuly created a course!');
                         },
                         errorFunction: (error) {
-                          debugPrint("HOLAAAAA");
                           requesting = false;
                           return _ackAlert(
                             context: context,
@@ -166,7 +162,6 @@ class _HomeState extends State<Home> {
                             message: error.toString());
                         },
                         timeoutFunction: () {
-                          debugPrint("HOLAAAAA");
                           requesting = false;
                           return _ackAlert(
                             context: context,
@@ -185,7 +180,7 @@ class _HomeState extends State<Home> {
         })));
   }
 
-  Widget _list(List<CourseInfo> courses) {
+  Widget _list(List<StudentInfo> courses) {
     return courses.isEmpty ? Center(child: Text('There are no courses available yet!')
       ) : ListView.builder(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
@@ -197,7 +192,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _item(CourseInfo element, int position) {
+  Widget _item(StudentInfo element, int position) {
     return Dismissible(
         background: _backgroundSlide(),
         key: UniqueKey(),
