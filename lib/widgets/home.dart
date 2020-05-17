@@ -191,7 +191,8 @@ class _HomeState extends State<Home> {
   }
 
   Widget _list(List<CourseInfo> courses) {
-    return ListView.builder(
+    return courses.isEmpty ? Center(child: Text('There are no courses available yet!')
+      ) : ListView.builder(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
       itemCount: courses.length,
       itemBuilder: (context, position) {
