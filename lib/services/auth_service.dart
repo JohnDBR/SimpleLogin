@@ -4,15 +4,10 @@ import 'api.dart';
 
 class AuthService {
   Api _api = locator<Api>();
-  // String _email;
-  // String _password;
-  // String _token;
   UserInfo user;
   bool tokenStatus = false;
 
   Future signInRequest({String email, String password}) async {
-    // _email = email;
-    // _password = password;
     try {
       user = await _api.signInRequest(email: email, password: password);
       tokenStatus = true;
@@ -23,8 +18,6 @@ class AuthService {
   }
 
   Future signUpRequest({String email, String password, String username, String name}) async {
-    // _email = email;
-    // _password = password;
     try {
       user = await _api.signUpRequest(email: email, password: password, username: username, name: name);
     } catch (err) {

@@ -41,14 +41,23 @@ class _MainPageState extends State<MainPage> {
       ),
       home: BaseView<SignInViewModel>(
         onModelReady: (model) async {
-            userModel.loadSession();
-            model.checkToken(token: userModel.userInfo.token);
-          },
-        builder: (context, model, child) => (userModel.logged || model.tokenStatus) ? Home(userModel: userModel, notifyParent: () {
-          // model.checkToken(token: userModel.userInfo.token);
-          }) : SignIn(userModel: userModel, notifyParent: () {
-            debugPrint('NOT EVIL! PLAYING SMART!');
-          },)
+          await userModel.loadSession();
+          await model.checkToken(token: userModel.userInfo.token,
+          resultFunction: (val) {},
+          errorFunction: (error) {});
+          setState(() {
+            _logged = userModel.logged && model.tokenStatus;
+          });
+        },
+        builder: (context, model, child) => _logged ? Home(userModel: userModel, notifyParent: () {
+          setState(() {
+            _logged = userModel.logged && model.tokenStatus;
+          });
+        }) : SignIn(userModel: userModel, notifyParent: () {
+          setState(() {
+            _logged = userModel.logged && model.tokenStatus;
+          });
+        })
       )
     );
   }

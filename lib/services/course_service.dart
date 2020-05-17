@@ -5,14 +5,10 @@ import 'api.dart';
 class CourseService {
   Api _api = locator<Api>();
 
-  // String _user;
-  // String _token;
   List<CourseInfo> _courses;
   List<CourseInfo> get courses => _courses;
 
   Future getCourses({String username, String token}) async {
-    // _user = username;
-    // _token = token;
     try {
       _courses = await _api.getCourses(token: token, username: username);
     } catch (err) {

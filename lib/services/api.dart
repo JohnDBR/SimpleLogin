@@ -23,7 +23,6 @@ class Api {
     print('${response.statusCode}');
     if (response.statusCode == 200) {
       print("signup successful");
-      // login(UserInfo.fromSignUp(json.decode(response.body)));
       return UserInfo.fromSignUp(json.decode(response.body));
     } else {
       print("signup failed");
@@ -47,12 +46,6 @@ class Api {
     print('${response.statusCode}');
     if (response.statusCode == 200) {
       print("signin successful");
-      // login(UserInfo.fromSignUp(json.decode(response.body)));
-      // if (rmbMe) {
-      //   rememberMe(email, password, rmbMe);
-      // } else {
-      //   rememberMe('null', 'null', rmbMe);
-      // }
       return UserInfo.fromSignUp(json.decode(response.body));
     } else {
       print("signup failed");
@@ -75,7 +68,6 @@ class Api {
       return json.decode(response.body)['valid'];
     } else {
       print("Token verification failed");
-      // logout();
      throw Exception(response.body);
     }
   }
@@ -95,7 +87,6 @@ class Api {
       return CourseInfo.fromCreate(json.decode(response.body));
     } else {
       print("Course creation failed");
-      // tokenTimeout(json.decode(response.body)['error']);
       throw Exception(response.body);
     }
   }
@@ -119,7 +110,6 @@ class Api {
       return courses;
     } else {
       print("Courses retrieving failed");
-      // tokenTimeout(json.decode(response.body)['error']);
       throw Exception(response.body);
     }
   }
