@@ -6,7 +6,10 @@ class CourseService {
   Api _api = locator<Api>();
 
   List<CourseInfo> _courses;
+  CourseInfo _course;
+
   List<CourseInfo> get courses => _courses;
+  CourseInfo get course => _course;
 
   Future getCourses({String username, String token}) async {
     try {
@@ -27,4 +30,12 @@ class CourseService {
     }
   }
 
+  Future showCourse({String username, String token, String courseId}) async {
+    try {
+      _course = await _api.showCourse(token: token, username: username, courseId: courseId);
+    } catch (err) {
+      print('service showCourses ${err.toString()}');
+      return Future.error(err.toString());
+    }
+  }
 } 

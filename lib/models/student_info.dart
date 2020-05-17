@@ -1,29 +1,50 @@
 class StudentInfo {
   final int id;
-  final String name;
+  final int personId;
+  final int courseId;
   final String dbId;
+  final String name;
+  final String email;
+  final String username;
+  final String phone;
+  final String city;
+  final String country;
+  final String birthday;
   final String createdAt;
   final String updatedAt;
-  final int students;
-  final String professor;
 
-  StudentInfo({this.name, this.dbId, this.id, this.createdAt, this.updatedAt, this.students, this.professor});
+  StudentInfo({this.id, this.personId, this.courseId, this.dbId, this.name, this.email, this.username, this.phone, this.city, this.country, this.birthday, this.createdAt, this.updatedAt});
 
   factory StudentInfo.fromCreate(Map<String, dynamic> json) {
     return StudentInfo(
-      name: json['name'],
+      dbId: json['dbId'],
       id: json['id'],
-      students: json['students'],
-      professor: json['professor']
+      personId: json['person_id'],
+      courseId: json['course_id'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at']
     );
   }
 
   factory StudentInfo.fromList(Map<String, dynamic> json) {
     return StudentInfo(
-      name: json['name'],
       id: json['id'],
-      students: json['students'],
-      professor: json['professor']
+      name: json['name'],
+      email: json['email'],
+      username: json['username']
+    );
+  }
+
+  factory StudentInfo.fromView(Map<String, dynamic> json) {
+    return StudentInfo(
+      courseId: json['course_id'],
+      name: json['name'],
+      username: json['username'],
+      phone: json['phone'],
+      email: json['email'],
+      city: json['city'],
+      country: json['country'],
+      birthday: json['birthday']
     );
   }
 }

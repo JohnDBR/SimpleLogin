@@ -146,7 +146,6 @@ class Api {
       '$baseUrl/$username/students',
       headers: <String, String>{
         'Authorization': 'Bearer $token'
-        // body params
       }
     );
 
@@ -184,12 +183,11 @@ class Api {
     }
   }
 
-   Future<StudentInfo> showStudent({String token, String username, String studentId}) async {
+  Future<StudentInfo> showStudent({String token, String username, String studentId}) async {
     final http.Response response = await http.get(
       '$baseUrl/$username/students/$studentId',
       headers: <String, String>{
         'Authorization': 'Bearer $token'
-        // body params
       }
     );
 
@@ -229,12 +227,11 @@ class Api {
     }
   }
 
-  Future<TeacherInfo> showTeachers({String token, String username, String teacherID}) async {
+  Future<TeacherInfo> showTeacher({String token, String username, String teacherId}) async {
     final http.Response response = await http.get(
-      '$baseUrl/$username/professors/$teacherID',
+      '$baseUrl/$username/professors/$teacherId',
       headers: <String, String>{
         'Authorization': 'Bearer $token'
-        // body params
       }
     );
 
@@ -242,7 +239,7 @@ class Api {
     print('${response.statusCode}');
     if (response.statusCode == 200) {
       print("Teacher show was done successfully");
-      return TeacherInfo.fromCreate(json.decode(response.body));
+      return TeacherInfo.fromView(json.decode(response.body));
     } else {
       print("Teacher show failed");
       throw Exception(response.body);

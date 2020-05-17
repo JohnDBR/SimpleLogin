@@ -1,22 +1,20 @@
-
-import 'package:flutter/foundation.dart';
 import 'package:login_flutter/base/base_model.dart';
-import 'package:login_flutter/models/course_info.dart';
-import 'package:login_flutter/services/course_service.dart';
+import 'package:login_flutter/models/student_info.dart';
+import 'package:login_flutter/services/student_service.dart';
 import '../locator.dart';
 
-class HomeViewModel extends BaseModel {
-  CourseService _courseService = locator<CourseService>();
-  List<CourseInfo> get courses => _courseService.courses;
+class StudentViewModel extends BaseModel {
+  final StudentService _studentService = locator<StudentService>();
+  List<StudentInfo> get students => _studentService.students;
 
-  Future getCourses({
+  Future getStudents({
     String username,
     String token,
     final Function(dynamic) resultFunction,
     final Function(dynamic) errorFunction,
     final Function() timeoutFunction}) async {
     setState(ViewState.Busy);
-    _courseService.getCourses(username: username, token: token)
+    _studentService.getStudents(username: username, token: token)
       .then((dynamic) {
         setState(ViewState.Idle);
         resultFunction(dynamic);
@@ -31,27 +29,24 @@ class HomeViewModel extends BaseModel {
       });
   }
 
-  Future addCourse({
+  Future addStudent({
     String username, 
-    String token, 
+    String token,
+    String courseId,
     final Function(dynamic) resultFunction, 
     final Function(dynamic) errorFunction,
     final Function() timeoutFunction}) async {
     setState(ViewState.Busy);
-    debugPrint('otro debug 1');
-    await _courseService.addCourse(username: username, token: token)
+    await _studentService.addStudent(username: username, token: token)
       .then((dynamic) {
-        debugPrint('otro debug');
         setState(ViewState.Idle);
         resultFunction(dynamic);
       })
       .catchError((error) {
-        debugPrint('error debug');
         setState(ViewState.Idle);
-        errorFunction(error); // return Future.error(error);
+        errorFunction(error);
       })
       .timeout(Duration(seconds: 10), onTimeout: () {
-        debugPrint('Timeout debugl');
         setState(ViewState.Idle);
         timeoutFunction();
       });

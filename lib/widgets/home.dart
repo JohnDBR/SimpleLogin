@@ -111,7 +111,7 @@ class _HomeState extends State<Home> {
                         )),
                   ],
                 )),
-        drawer: DrawerMenu(),
+        drawer: DrawerMenu(userModel: widget.userModel),
         floatingActionButton: Consumer<UserModel>(
             //                  <--- Consumer
             builder: (context, userModel, child) {
@@ -125,6 +125,7 @@ class _HomeState extends State<Home> {
                 //                  <--- Consumer
                 builder: (context, userModel, child) {
                 return FloatingActionButton.extended(
+                  heroTag: "logout_btn",
                   onPressed: () {
                     userModel.logout();
                     setState(() {
@@ -140,10 +141,10 @@ class _HomeState extends State<Home> {
               Align(
                 alignment: Alignment.bottomRight,
                 child: new FloatingActionButton(
+                  heroTag: "add_course_btn",
                   onPressed: () {
                     if (!requesting) {
                       requesting = true;
-                      debugPrint("HOLAAAAA");
                       model.addCourse(
                         username: widget.userModel.userInfo.username,
                         token: widget.userModel.userInfo.token,
@@ -158,7 +159,6 @@ class _HomeState extends State<Home> {
                             message: 'You have successfuly created a course!');
                         },
                         errorFunction: (error) {
-                          debugPrint("HOLAAAAA");
                           requesting = false;
                           return _ackAlert(
                             context: context,
@@ -166,7 +166,6 @@ class _HomeState extends State<Home> {
                             message: error.toString());
                         },
                         timeoutFunction: () {
-                          debugPrint("HOLAAAAA");
                           requesting = false;
                           return _ackAlert(
                             context: context,
