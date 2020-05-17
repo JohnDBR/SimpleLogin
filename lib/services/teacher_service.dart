@@ -15,7 +15,7 @@ class TeacherService {
     try {
       _teachers = await _api.getTeachers(token: token, username: username);
     } catch (err) {
-      print('service getCourses ${err.toString()}');
+      print('service getTeachers ${err.toString()}');
       return Future.error(err.toString());
     }
   }
@@ -24,7 +24,7 @@ class TeacherService {
     try {
       _teacher = await _api.showTeacher(token: token, username: username, teacherId: teacherId);
     } catch (err) {
-      print('service getTeacher ${err.toString()}');
+      print('service showTeacher ${err.toString()}');
       return Future.error(err.toString());
     }
   }

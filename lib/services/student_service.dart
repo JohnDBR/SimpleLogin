@@ -15,7 +15,7 @@ class StudentService {
     try {
       _students = await _api.getStudents(token: token, username: username);
     } catch (err) {
-      print('service getCourses ${err.toString()}');
+      print('service getStudents ${err.toString()}');
       return Future.error(err.toString());
     }
   }
@@ -25,7 +25,7 @@ class StudentService {
       StudentInfo student = await _api.createStudent(token: token, username: username, courseId: courseId);
       _students.add(student);
     } catch (err) {
-      print('service getCourses ${err.toString()}');
+      print('service addStudent ${err.toString()}');
       return Future.error(err.toString());
     }
   }
@@ -34,7 +34,7 @@ class StudentService {
     try {
       _student = await _api.showStudent(token: token, username: username, studentId: studentId);
     } catch (err) {
-      print('service showCourses ${err.toString()}');
+      print('service showStudent ${err.toString()}');
       return Future.error(err.toString());
     }
   }
