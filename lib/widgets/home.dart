@@ -6,6 +6,8 @@ import 'package:login_flutter/viewmodels/home_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
 
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
 class Home extends StatefulWidget {
   final UserModel userModel;
   final Function() notifyParent;
@@ -53,13 +55,24 @@ class _HomeState extends State<Home> {
             username: widget.userModel.userInfo.username, // Provider.of<UserModel>(context).userInfo.username,
             token: widget.userModel.userInfo.token, // Provider.of<UserModel>(context).userInfo.token
             resultFunction: (val) {
-              courses.then((value) {
-                value = model.courses;
-              });
+              courses = Future.value(model.courses);
+            },
+            errorFunction: (error) {
+              return _ackAlert(
+                context: _scaffoldKey.currentContext,
+                title: 'Error',
+                message: error.toString());
+            },
+            timeoutFunction: () {
+              return _ackAlert(
+                context: _scaffoldKey.currentContext,
+                title: 'Error',
+                message: 'Timeout > 10secs');
             }
           );
         },
         builder: (context, model, child) => Scaffold(
+        key: _scaffoldKey,
         appBar: new AppBar(title: Text('Home')),
         body: model.state == ViewState.Busy
                 ? Center(child: CircularProgressIndicator())
@@ -89,6 +102,9 @@ class _HomeState extends State<Home> {
 
                             // By default, show a loading spinner.
                             // return CircularProgressIndicator();
+                            return Center(
+                              child: Text('There are no courses available yet!')
+                            );
                           },
                         )),
                   ],
@@ -124,9 +140,10 @@ class _HomeState extends State<Home> {
                   onPressed: () {
                     if (!requesting) {
                       requesting = true;
+                      debugPrint("HOLAAAAA");
                       model.addCourse(
-                        username: Provider.of<UserModel>(context).userInfo.username,
-                        token: Provider.of<UserModel>(context).userInfo.token,
+                        username: widget.userModel.userInfo.username,
+                        token: widget.userModel.userInfo.token,
                         resultFunction: (val) {
                             // setState(() {
                             // _retrieveCourses();
@@ -136,6 +153,9 @@ class _HomeState extends State<Home> {
                             //     list.add(course);
                             //   });
                             // });
+                          setState(() {
+                            courses = Future.value(model.courses);
+                          });
                           requesting = false;
                           return _ackAlert(
                             context: context,
@@ -143,6 +163,7 @@ class _HomeState extends State<Home> {
                             message: 'You have successfuly created a course!');
                         },
                         errorFunction: (error) {
+                          debugPrint("HOLAAAAA");
                           requesting = false;
                           return _ackAlert(
                             context: context,
@@ -150,6 +171,7 @@ class _HomeState extends State<Home> {
                             message: error.toString());
                         },
                         timeoutFunction: () {
+                          debugPrint("HOLAAAAA");
                           requesting = false;
                           return _ackAlert(
                             context: context,

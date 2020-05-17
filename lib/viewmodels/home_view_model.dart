@@ -1,4 +1,5 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/models/course_info.dart';
 import 'package:login_flutter/services/course_service.dart';
@@ -38,16 +39,20 @@ class HomeViewModel extends BaseModel {
     final Function(dynamic) errorFunction,
     final Function() timeoutFunction}) async {
     setState(ViewState.Busy);
+    debugPrint('otro debug 1');
     await _courseService.addCourse(username: username, token: token)
       .then((dynamic) {
+        debugPrint('otro debug');
         setState(ViewState.Idle);
         resultFunction(dynamic);
       })
       .catchError((error) {
+        debugPrint('error debug');
         setState(ViewState.Idle);
         errorFunction(error); // return Future.error(error);
       })
       .timeout(Duration(seconds: 10), onTimeout: () {
+        debugPrint('Timeout debugl');
         setState(ViewState.Idle);
         timeoutFunction();
       });
