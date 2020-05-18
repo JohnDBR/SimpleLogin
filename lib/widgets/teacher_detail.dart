@@ -87,24 +87,27 @@ class _TeacherDetailState extends State<TeacherDetail> {
               body: model.state == ViewState.Busy
                   ? Center(child: CircularProgressIndicator())
                   : Container(
-                      margin: const EdgeInsets.all(0),
+                      margin: const EdgeInsets.all(5),
                       child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        MainAxisAlignment : MainAxisAlignment.SpaceEvenly , 
+                        
                         children: <Widget>[
                          Container(
-                            alignment: Alignment.topLeft,
-                            width: 100.0,
-                            height: 100.0,
+                            alignment: Alignment.topCenter,
+                            
+                            width: 220.0,
+                            height: 200.0,
+                            decoration: myBoxDecoration(),
                             child: Icon(Icons.person_outline , size: 200),
+                          ),Divider(
+                            color: Colors.black,
                           ),
                           Container(
                               alignment: Alignment.topCenter,
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
-                              child: Text('${model.teacher.name}',
-                                  style: TextStyle(height: 3, fontSize: 25))), Divider(
+                              child: Text('NAME : ${model.teacher.name}',
+                                  style: TextStyle(height: 2, fontSize: 15))), Divider(
                             color: Colors.black,
                           ),
                           Container(
@@ -112,8 +115,8 @@ class _TeacherDetailState extends State<TeacherDetail> {
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
-                              child: Text('${model.teacher.email}',
-                                  style: TextStyle(height: 3, fontSize: 25))), Divider(
+                              child: Text('EMAIL : ${model.teacher.email}',
+                                  style: TextStyle(height: 2, fontSize: 15))), Divider(
                             color: Colors.black,
                           ),
                           Container(
@@ -122,8 +125,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                                       AppBar().preferredSize.height) /
                                   10,
                               child: Text("ID : ${widget.teacherId}" ,
-                                  style: TextStyle(height: 3, fontSize: 25))),
-                          Divider(
+                                  style: TextStyle(height: 2, fontSize: 15))), Divider(
                             color: Colors.black,
                           ),
                           Container(
@@ -131,9 +133,8 @@ class _TeacherDetailState extends State<TeacherDetail> {
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
-                              child: Text('${model.teacher.country}',
-                                  style: TextStyle(height: 3, fontSize: 25))), 
-                                  Divider(
+                              child: Text('COUNTRY : ${model.teacher.country}',
+                                  style: TextStyle(height: 2, fontSize: 15))), Divider(
                             color: Colors.black,
                           ),
                         ],
@@ -312,4 +313,11 @@ class _TeacherDetailState extends State<TeacherDetail> {
           alignment: Alignment.centerRight,
         ));
   }
+  BoxDecoration myBoxDecoration() {
+  return BoxDecoration(
+    border: Border.all(
+    color : Colors.red,
+    width : 5.0 ,),
+  );
+}
 }

@@ -87,6 +87,7 @@ class _CourseDetailState extends State<CourseDetail> {
                 margin: const EdgeInsets.all(0),
                     child: Column(
                   children: <Widget>[
+                  
                     Container(
                         alignment: Alignment.topCenter,
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
@@ -99,32 +100,41 @@ class _CourseDetailState extends State<CourseDetail> {
                     ),
                     Container(
                         alignment: Alignment.topCenter,
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        padding: const EdgeInsets.fromLTRB(5, 5, 200, 5),
                         child: Text(
                           'Teacher\'s info',
                           style: TextStyle(height: 1, fontSize: 25))
                         ),
+                        Container(
+                            alignment: Alignment.topCenter,
+                            padding: const EdgeInsets.fromLTRB(5, 5, 1000, 5),
+                            width: 300.0,
+                            height: 20.0,
+                            
+                            child: Icon(Icons.person_outline , size: 100),
+                          ),
                     Container(
                         alignment: Alignment.topCenter,
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        padding: const EdgeInsets.fromLTRB(150, 5, 5, 5),
                         child: Text(
-                          '${model.course.teacherInfo.name}',
+                          'Name: ${model.course.teacherInfo.name}',
                           style: TextStyle(height: 1, fontSize: 15))
                         ),
                     Container(
                         alignment: Alignment.topCenter,
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        padding: const EdgeInsets.fromLTRB(150, 5, 5, 5),
                         child: Text(
-                          '${model.course.teacherInfo.email}',
+                          'Email: ${model.course.teacherInfo.email}',
                           style: TextStyle(height: 1, fontSize: 15))
                         ),
                     Container(
                         alignment: Alignment.topCenter,
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        padding: const EdgeInsets.fromLTRB(150, 5, 5, 5),
                         child: Text(
-                          '${model.course.teacherInfo.username}',
+                          'Username: ${model.course.teacherInfo.username}',
                           style: TextStyle(height: 1, fontSize: 15))
                         ),
+                        
                     Divider(
                       color: Colors.black,
                     ),

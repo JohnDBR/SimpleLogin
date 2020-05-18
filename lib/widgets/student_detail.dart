@@ -86,25 +86,28 @@ class _StudentDetailState extends State<StudentDetail> {
               body: model.state == ViewState.Busy
                   ? Center(child: CircularProgressIndicator())
                   : Container(
-                      margin: const EdgeInsets.all(0),
+                      margin: const EdgeInsets.all(5),
                       child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        MainAxisAlignment : MainAxisAlignment.SpaceEvenly ,
+                        
                         children: <Widget>[
                           Container(
-                            alignment: Alignment.topLeft,
-                            width: 100.0,
-                            height: 100.0,
+                            alignment: Alignment.topCenter,
+                            
+                            width: 220.0,
+                            height: 200.0,
+                            decoration: myBoxDecoration(),
                             child: Icon(Icons.person , size: 200),
+                          ),Divider(
+                            color: Colors.black,
                           ),
                           Container(
                               alignment: Alignment.topCenter,
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
-                              padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-                              child: Text('${model.student.name}',
-                                  style: TextStyle(height: 3, fontSize: 25))), Divider(
+                              padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                              child: Text('NAME : ${model.student.name}',
+                                  style: TextStyle(height: 2, fontSize: 15))), Divider(
                             color: Colors.black,
                           ),
                           Container(
@@ -112,8 +115,9 @@ class _StudentDetailState extends State<StudentDetail> {
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
-                              child: Text('${model.student.email}',
-                                  style: TextStyle(height: 3, fontSize: 25))), Divider(
+                                   padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                              child: Text("EMAIL : ${model.student.email}",
+                                  style: TextStyle(height: 2, fontSize: 15))), Divider(
                             color: Colors.black,
                           ),
                           Container(
@@ -121,8 +125,9 @@ class _StudentDetailState extends State<StudentDetail> {
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
+                                   padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                               child: Text("ID: ${widget.studentId}",
-                                  style: TextStyle(height: 3, fontSize: 25))),
+                                  style: TextStyle(height: 2, fontSize: 15))),
                           Divider(
                             color: Colors.black,
                           ), Container(
@@ -130,8 +135,10 @@ class _StudentDetailState extends State<StudentDetail> {
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
-                              child: Text('${model.student.country}',
-                                  style: TextStyle(height: 3, fontSize: 25))), 
+
+                               padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                              child: Text('COUNTRY : ${model.student.country}',
+                                  style: TextStyle(height: 2, fontSize: 15))),
                                   Divider(
                             color: Colors.black,
                           ),
@@ -310,4 +317,12 @@ class _StudentDetailState extends State<StudentDetail> {
           alignment: Alignment.centerRight,
         ));
   }
+
+  BoxDecoration myBoxDecoration() {
+  return BoxDecoration(
+    border: Border.all(
+    color : Colors.red,
+    width : 5.0 ,),
+  );
+}
 }
