@@ -119,7 +119,7 @@ class _StudentDetailState extends State<StudentDetail> {
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
-                              child: Text("ID:" + Widget.studentIds,
+                              child: Text("ID: ${widget.studentId}",
                                   style: TextStyle(height: 3, fontSize: 25))),
                           Divider(
                             color: Colors.black,
