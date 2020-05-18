@@ -102,29 +102,29 @@ class _StudentDetailState extends State<StudentDetail> {
                                   10,
                               padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
                               child: Text('${model.student.name}',
-                                  style: TextStyle(height: 1, fontSize: 20))), Divider(
+                                  style: TextStyle(height: 3, fontSize: 25))), Divider(
                             color: Colors.black,
                           ),
                           Container(
-                              alignment: Alignment(0.0, -0.9),
+                              alignment: Alignment(0.0, -0.85),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
                               child: Text('${model.student.email}',
-                                  style: TextStyle(height: 1, fontSize: 20))), Divider(
+                                  style: TextStyle(height: 3, fontSize: 25))), Divider(
                             color: Colors.black,
                           ),
                           Container(
-                              alignment: Alignment(0.0, -0.8),
+                              alignment: Alignment(0.0, -0.75),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
                               child: Text("ID:" + Widget.studentIds,
-                                  style: TextStyle(height: 1, fontSize: 20))),
+                                  style: TextStyle(height: 3, fontSize: 25))),
                           Divider(
                             color: Colors.black,
                           ), Container(
-                              alignment: Alignment(0.0, -0.7),
+                              alignment: Alignment(0.0, -0.65),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,

@@ -106,7 +106,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                             color: Colors.black,
                           ),
                           Container(
-                              alignment: Alignment(0.0, -0.9),
+                              alignment: Alignment(0.0, -0.85),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
@@ -115,7 +115,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                             color: Colors.black,
                           ),
                           Container(
-                              alignment: Alignment(0.0, -0.8),
+                              alignment: Alignment(0.0, -0.75),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
@@ -125,7 +125,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                             color: Colors.black,
                           ),
                           Container(
-                              alignment: Alignment(0.0, -0.7),
+                              alignment: Alignment(0.0, -0.65),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
