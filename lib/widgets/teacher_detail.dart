@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/models/teacher_info.dart';
@@ -88,9 +91,31 @@ class _TeacherDetailState extends State<TeacherDetail> {
                       child: Column(
                         children: <Widget>[
                           Container(
+                            alignment: Alignment.topLeft,
+                            width: 100.0,
+                            height: 100.0,
+                            child: Icon(Icons.person),
+                          ),
+                          Container(
                               alignment: Alignment.topCenter,
-                              padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                              height: (MediaQuery.of(context).size.height -
+                                      AppBar().preferredSize.height) /
+                                  10,
                               child: Text('${model.teacher.name}',
+                                  style: TextStyle(height: 1, fontSize: 20))),
+                          Container(
+                              alignment: Alignment(0.0, -0.9),
+                              height: (MediaQuery.of(context).size.height -
+                                      AppBar().preferredSize.height) /
+                                  10,
+                              child: Text('${model.teacher.email}',
+                                  style: TextStyle(height: 1, fontSize: 20))),
+                          Container(
+                              alignment: Alignment(0.0, -0.8),
+                              height: (MediaQuery.of(context).size.height -
+                                      AppBar().preferredSize.height) /
+                                  10,
+                              child: Text("ID : " + '${model.teacher.id}',
                                   style: TextStyle(height: 1, fontSize: 20))),
                           Divider(
                             color: Colors.black,

@@ -90,9 +90,32 @@ class _StudentDetailState extends State<StudentDetail> {
                       child: Column(
                         children: <Widget>[
                           Container(
+                            alignment: Alignment.topLeft,
+                            width: 100.0,
+                            height: 100.0,
+                            child: Icon(Icons.person),
+                          ),
+                          Container(
                               alignment: Alignment.topCenter,
+                              height: (MediaQuery.of(context).size.height -
+                                      AppBar().preferredSize.height) /
+                                  10,
                               padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
                               child: Text('${model.student.name}',
+                                  style: TextStyle(height: 1, fontSize: 20))),
+                          Container(
+                              alignment: Alignment(0.0, -0.9),
+                              height: (MediaQuery.of(context).size.height -
+                                      AppBar().preferredSize.height) /
+                                  10,
+                              child: Text('${model.student.email}',
+                                  style: TextStyle(height: 1, fontSize: 20))),
+                          Container(
+                              alignment: Alignment(0.0, -0.8),
+                              height: (MediaQuery.of(context).size.height -
+                                      AppBar().preferredSize.height) /
+                                  10,
+                              child: Text("ID:" + '${model.student.id}',
                                   style: TextStyle(height: 1, fontSize: 20))),
                           Divider(
                             color: Colors.black,
