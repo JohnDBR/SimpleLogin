@@ -119,9 +119,19 @@ class _TeacherDetailState extends State<TeacherDetail> {
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
-                              child: Text("ID : " + '${model.teacher.id}',
+                              child: Text("ID : " + Widget.teacherId,
                                   style: TextStyle(height: 3, fontSize: 25))),
                           Divider(
+                            color: Colors.black,
+                          ),
+                          Container(
+                              alignment: Alignment(0.0, -0.7),
+                              height: (MediaQuery.of(context).size.height -
+                                      AppBar().preferredSize.height) /
+                                  10,
+                              child: Text('${model.teacher.country}',
+                                  style: TextStyle(height: 3, fontSize: 25))), 
+                                  Divider(
                             color: Colors.black,
                           ),
                         ],
