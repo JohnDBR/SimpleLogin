@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/models/course_info.dart';
-import 'package:login_flutter/viewmodels/course_detail_view_model.dart';
 import 'package:login_flutter/viewmodels/home_view_model.dart';
 import 'package:login_flutter/widgets/course_detail.dart';
 import 'package:provider/provider.dart';

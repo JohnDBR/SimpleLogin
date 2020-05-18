@@ -51,7 +51,7 @@ class UserModel extends ChangeNotifier {
 
   // Error handler methods!
   void tokenTimeout(String error) {
-    if (json.decode(error)['error'] == 'Token inválido.') {
+    if (json.decode(error.split('Exception:').last)['error'] == 'Token inválido.') {
       logout();
     }
   }

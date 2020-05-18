@@ -164,27 +164,6 @@ class _CourseDetailState extends State<CourseDetail> {
           return Stack(
             children: <Widget>[
               Align(
-                alignment: Alignment.bottomLeft,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
-                  child: Consumer<UserModel>(
-                //                  <--- Consumer
-                builder: (context, userModel, child) {
-                return FloatingActionButton.extended(
-                  heroTag: "logout_btn",
-                  onPressed: () {
-                    userModel.logout();
-                    setState(() {
-                      widget.notifyParent();
-                    });
-                  },
-                  icon: Icon(Icons.power_settings_new),
-                  label: Text('Logout',
-                      style: TextStyle(height: 1, fontSize: 25)),
-                );
-              })
-              )),
-              Align(
                 alignment: Alignment.bottomRight,
                 child: new FloatingActionButton(
                   heroTag: "add_student_btn",
@@ -194,20 +173,22 @@ class _CourseDetailState extends State<CourseDetail> {
                       model.addStudent(
                         username: widget.userModel.userInfo.username,
                         token: widget.userModel.userInfo.token,
-                        courseId: '${model.course.id}',
+                        courseId: '${widget.courseId}',
                         resultFunction: (val) {
-                          setState(() {
-                            //  
-                          });
+                            students.then((list) {
+                              setState(() {
+                                list.add(model.student);
+                              });
+                            });
                           requesting = false;
                           return _ackAlert(
                             context: context,
                             title: 'SignIn',
                             message: 'You have successfuly created a course!');
                         },
-                        errorFunction: (error) {            
+                        errorFunction: (error) {         
+                          requesting = false;   
                           widget.userModel.tokenTimeout(error);
-                          requesting = false;
                           return _ackAlert(
                             context: context,
                             title: 'Error',

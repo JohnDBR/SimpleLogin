@@ -22,8 +22,11 @@ class StudentService {
 
   Future addStudent({String username, String token, String courseId}) async {
     try {
-      StudentInfo student = await _api.createStudent(token: token, username: username, courseId: courseId);
-      _students.add(student);
+      _student = await _api.createStudent(token: token, username: username, courseId: courseId);
+      if (_students == null) {
+        _students = new List<StudentInfo>();
+      }
+      _students.add(_student);
     } catch (err) {
       print('service addStudent ${err.toString()}');
       return Future.error(err.toString());

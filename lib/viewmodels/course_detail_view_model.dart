@@ -43,7 +43,7 @@ class CourseDetailViewModel extends BaseModel {
     final Function(dynamic) errorFunction,
     final Function() timeoutFunction}) async {
     setState(ViewState.Busy);
-    await _studentService.addStudent(username: username, token: token)
+    await _studentService.addStudent(username: username, token: token, courseId: courseId)
       .then((dynamic) {
         setState(ViewState.Idle);
         resultFunction(dynamic);

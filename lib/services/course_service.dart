@@ -23,6 +23,9 @@ class CourseService {
   Future addCourse({String username, String token}) async {
     try {
       CourseInfo course = await _api.createCourse(token: token, username: username);
+      if (_courses == null) {
+        _courses = new List<CourseInfo>();
+      }
       _courses.add(course);
     } catch (err) {
       print('service addCourse ${err.toString()}');

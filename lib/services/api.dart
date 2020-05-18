@@ -145,15 +145,19 @@ class Api {
     final http.Response response = await http.post(
       '$baseUrl/$username/students',
       headers: <String, String>{
-        'Authorization': 'Bearer $token'
-      }
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+      body: jsonEncode(<String, String>{
+        'courseId': courseId
+      }),
     );
 
     print('${response.body}');
     print('${response.statusCode}');
     if (response.statusCode == 200) {
       print("Student creation was done successfully");
-      return StudentInfo.fromCreate(json.decode(response.body));
+      return StudentInfo.fromList(json.decode(response.body));
     } else {
       print("Student creation failed");
       throw Exception(response.body);
