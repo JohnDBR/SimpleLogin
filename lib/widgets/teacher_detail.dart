@@ -90,11 +90,11 @@ class _TeacherDetailState extends State<TeacherDetail> {
                       margin: const EdgeInsets.all(0),
                       child: Column(
                         children: <Widget>[
-                          Container(
+                         Container(
                             alignment: Alignment.topLeft,
                             width: 100.0,
                             height: 100.0,
-                            child: Icon(Icons.person),
+                            child: Icon(Icons.person , size: 100),
                           ),
                           Container(
                               alignment: Alignment.topCenter,
@@ -102,14 +102,18 @@ class _TeacherDetailState extends State<TeacherDetail> {
                                       AppBar().preferredSize.height) /
                                   10,
                               child: Text('${model.teacher.name}',
-                                  style: TextStyle(height: 1, fontSize: 20))),
+                                  style: TextStyle(height: 1, fontSize: 20))), Divider(
+                            color: Colors.black,
+                          ),
                           Container(
                               alignment: Alignment(0.0, -0.9),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
                               child: Text('${model.teacher.email}',
-                                  style: TextStyle(height: 1, fontSize: 20))),
+                                  style: TextStyle(height: 1, fontSize: 20))), Divider(
+                            color: Colors.black,
+                          ),
                           Container(
                               alignment: Alignment(0.0, -0.8),
                               height: (MediaQuery.of(context).size.height -
