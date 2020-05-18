@@ -15,7 +15,11 @@ class TeacherDetail extends StatefulWidget {
   final Function() notifyParent;
   final String teacherId;
 
-  TeacherDetail({Key key, @required this.userModel, @required this.notifyParent, @required this.teacherId})
+  TeacherDetail(
+      {Key key,
+      @required this.userModel,
+      @required this.notifyParent,
+      @required this.teacherId})
       : super(key: key);
 
   @override
@@ -52,135 +56,136 @@ class _TeacherDetailState extends State<TeacherDetail> {
   @override
   Widget build(BuildContext context) {
     return BaseView<TeacherDetailViewModel>(
-        onModelReady: (model) { 
+        onModelReady: (model) {
           model.showTeacher(
-            username: widget.userModel.userInfo.username,
-            token: widget.userModel.userInfo.token,
-            teacherId: widget.teacherId,
-            resultFunction: (val) {
-              // teachers = Future.value(model.teachers);
-            },
-            errorFunction: (error) {
-              widget.userModel.tokenTimeout(error);
-              return _ackAlert(
-                context: _scaffoldKey.currentContext,
-                title: 'Error',
-                message: error.toString());
-            },
-            timeoutFunction: () {
-              return _ackAlert(
-                context: _scaffoldKey.currentContext,
-                title: 'Error',
-                message: 'Timeout > 10secs');
-            }
-          );
+              username: widget.userModel.userInfo.username,
+              token: widget.userModel.userInfo.token,
+              teacherId: widget.teacherId,
+              resultFunction: (val) {
+                // teachers = Future.value(model.teachers);
+              },
+              errorFunction: (error) {
+                widget.userModel.tokenTimeout(error);
+                return _ackAlert(
+                    context: _scaffoldKey.currentContext,
+                    title: 'Error',
+                    message: error.toString());
+              },
+              timeoutFunction: () {
+                return _ackAlert(
+                    context: _scaffoldKey.currentContext,
+                    title: 'Error',
+                    message: 'Timeout > 10secs');
+              });
         },
         builder: (context, model, child) => Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(title: Text('Teacher Detail')),
-        body: model.state == ViewState.Busy
-                ? Center(child: CircularProgressIndicator())
-                : Container(
-                margin: const EdgeInsets.all(0),
-                    child: Column(
-                  children: <Widget>[
-                    Container(
-                        alignment: Alignment.topCenter,
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-                        child: Text(
-                          '${model.teacher.name}',
-                          style: TextStyle(height: 1, fontSize: 20))
-                        ),
-                    Divider(
-                      color: Colors.black,
-                    ),
-                  ],
-                )),
-        drawer: DrawerMenu(userModel: widget.userModel),
-        // floatingActionButton: Consumer<UserModel>(
-        //     //                  <--- Consumer
-        //     builder: (context, userModel, child) {
-        //   return Stack(
-        //     children: <Widget>[
-        //       Align(
-        //         alignment: Alignment.bottomLeft,
-        //         child: Container(
-        //           padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
-        //           child: Consumer<UserModel>(
-        //         //                  <--- Consumer
-        //         builder: (context, userModel, child) {
-        //         return FloatingActionButton.extended(
-        //           onPressed: () {
-        //             userModel.logout();
-        //             setState(() {
-        //               widget.notifyParent();
-        //             });
-        //           },
-        //           icon: Icon(Icons.power_settings_new),
-        //           label: Text('Logout',
-        //               style: TextStyle(height: 1, fontSize: 25)),
-        //         );
-        //       })
-        //       )),
-        //       Align(
-        //         alignment: Alignment.bottomRight,
-        //         child: new FloatingActionButton(
-        //           onPressed: () {
-        //             if (!requesting) {
-        //               requesting = true;
-        //               debugPrint("HOLAAAAA");
-        //               model.addTeacher(
-        //                 username: widget.userModel.userInfo.username,
-        //                 token: widget.userModel.userInfo.token,
-        //                 resultFunction: (val) {
-        //                   setState(() {
-        //                     teacher = Future.value(model.teachers);
-        //                   });
-        //                   requesting = false;
-        //                   return _ackAlert(
-        //                     context: context,
-        //                     title: 'SignIn',
-        //                     message: 'You have successfuly created a course!');
-        //                 },
-        //                 errorFunction: (error) {
-        //                   debugPrint("HOLAAAAA");
-        //                   requesting = false;
-        //                   return _ackAlert(
-        //                     context: context,
-        //                     title: 'Error',
-        //                     message: error.toString());
-        //                 },
-        //                 timeoutFunction: () {
-        //                   debugPrint("HOLAAAAA");
-        //                   requesting = false;
-        //                   return _ackAlert(
-        //                     context: context,
-        //                     title: 'Error',
-        //                     message: 'Timeout > 10secs');
-        //                 }
-        //               );
-        //             }
-        //           },
-        //           tooltip: 'Add course',
-        //           child: new Icon(Icons.add)
-        //         )
-        //       ),
-        //     ],
-        //   );
-        // })
-        ));
+              key: _scaffoldKey,
+              appBar: AppBar(title: Text('Teacher Detail')),
+              body: model.state == ViewState.Busy
+                  ? Center(child: CircularProgressIndicator())
+                  : Container(
+                      margin: const EdgeInsets.all(0),
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            child: Card(ListTile(
+                              leading: Icon(Icons.people, size: 50),
+                              title: Text('${model.course.teacherInfo.name}'),
+                              subtitle:
+                                  Text('${model.course.teacherInfo.email}'),
+                            )),
+                          ),
+                          Divider(
+                            color: Colors.black,
+                          ),
+                        ],
+                      )),
+              drawer: DrawerMenu(userModel: widget.userModel),
+              // floatingActionButton: Consumer<UserModel>(
+              //     //                  <--- Consumer
+              //     builder: (context, userModel, child) {
+              //   return Stack(
+              //     children: <Widget>[
+              //       Align(
+              //         alignment: Alignment.bottomLeft,
+              //         child: Container(
+              //           padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
+              //           child: Consumer<UserModel>(
+              //         //                  <--- Consumer
+              //         builder: (context, userModel, child) {
+              //         return FloatingActionButton.extended(
+              //           onPressed: () {
+              //             userModel.logout();
+              //             setState(() {
+              //               widget.notifyParent();
+              //             });
+              //           },
+              //           icon: Icon(Icons.power_settings_new),
+              //           label: Text('Logout',
+              //               style: TextStyle(height: 1, fontSize: 25)),
+              //         );
+              //       })
+              //       )),
+              //       Align(
+              //         alignment: Alignment.bottomRight,
+              //         child: new FloatingActionButton(
+              //           onPressed: () {
+              //             if (!requesting) {
+              //               requesting = true;
+              //               debugPrint("HOLAAAAA");
+              //               model.addTeacher(
+              //                 username: widget.userModel.userInfo.username,
+              //                 token: widget.userModel.userInfo.token,
+              //                 resultFunction: (val) {
+              //                   setState(() {
+              //                     teacher = Future.value(model.teachers);
+              //                   });
+              //                   requesting = false;
+              //                   return _ackAlert(
+              //                     context: context,
+              //                     title: 'SignIn',
+              //                     message: 'You have successfuly created a course!');
+              //                 },
+              //                 errorFunction: (error) {
+              //                   debugPrint("HOLAAAAA");
+              //                   requesting = false;
+              //                   return _ackAlert(
+              //                     context: context,
+              //                     title: 'Error',
+              //                     message: error.toString());
+              //                 },
+              //                 timeoutFunction: () {
+              //                   debugPrint("HOLAAAAA");
+              //                   requesting = false;
+              //                   return _ackAlert(
+              //                     context: context,
+              //                     title: 'Error',
+              //                     message: 'Timeout > 10secs');
+              //                 }
+              //               );
+              //             }
+              //           },
+              //           tooltip: 'Add course',
+              //           child: new Icon(Icons.add)
+              //         )
+              //       ),
+              //     ],
+              //   );
+              // })
+            ));
   }
 
   Widget _list(List<TeacherInfo> courses) {
-    return courses.isEmpty ? Center(child: Text('There are no teachers available yet!')
-      ) : ListView.builder(
-      padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
-      itemCount: courses.length,
-      itemBuilder: (context, position) {
-        var element = courses[position];
-        return _item(element, position);
-      },
-    );
+    return courses.isEmpty
+        ? Center(child: Text('There are no teachers available yet!'))
+        : ListView.builder(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
+            itemCount: courses.length,
+            itemBuilder: (context, position) {
+              var element = courses[position];
+              return _item(element, position);
+            },
+          );
   }
 
   Widget _item(TeacherInfo element, int position) {
