@@ -5,7 +5,7 @@ import '../locator.dart';
 
 class TeacherDetailViewModel extends BaseModel {
   final TeacherService _studentService = locator<TeacherService>();
-  List<TeacherInfo> get teachers => _studentService.teachers;
+  TeacherInfo get teacher => _studentService.teacher;
 
   Future showTeacher({
     String username, 

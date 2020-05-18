@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:login_flutter/models/user_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,7 +51,7 @@ class UserModel extends ChangeNotifier {
 
   // Error handler methods!
   void tokenTimeout(String error) {
-    if (error == 'Token inválido.') {
+    if (json.decode(error)['error'] == 'Token inválido.') {
       logout();
     }
   }

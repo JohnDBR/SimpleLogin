@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/models/course_info.dart';
+import 'package:login_flutter/viewmodels/course_detail_view_model.dart';
 import 'package:login_flutter/viewmodels/home_view_model.dart';
+import 'package:login_flutter/widgets/course_detail.dart';
 import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
 
@@ -60,6 +62,7 @@ class _HomeState extends State<Home> {
               courses = Future.value(model.courses);
             },
             errorFunction: (error) {
+              widget.userModel.tokenTimeout(error);
               return _ackAlert(
                 context: _scaffoldKey.currentContext,
                 title: 'Error',
@@ -158,7 +161,8 @@ class _HomeState extends State<Home> {
                             title: 'SignIn',
                             message: 'You have successfuly created a course!');
                         },
-                        errorFunction: (error) {
+                        errorFunction: (error) {            
+                          widget.userModel.tokenTimeout(error);
                           requesting = false;
                           return _ackAlert(
                             context: context,
@@ -247,6 +251,11 @@ class _HomeState extends State<Home> {
                 onTap: () {
                   // print("${notes[position]} clicked");
                   // _onTap(context, element, position);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CourseDetail(userModel: widget.userModel, courseId: '${element.id}', notifyParent: () {})),
+                  );
                 },
                 child: ListTile(
                   leading: Icon(Icons.school, size: 50),

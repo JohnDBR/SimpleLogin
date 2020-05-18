@@ -3,28 +3,29 @@ import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/models/student_info.dart';
 import 'package:login_flutter/models/user_model.dart';
+import 'package:login_flutter/viewmodels/student_detail_view_model.dart';
 import 'package:login_flutter/viewmodels/student_view_model.dart';
-import 'package:login_flutter/widgets/student_detail.dart';
 import 'package:provider/provider.dart';
 
 import 'drawer_menu.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class Students extends StatefulWidget {
+class StudentDetail extends StatefulWidget {
   final UserModel userModel;
   final Function() notifyParent;
+  final String studentId;
 
-  Students({Key key, @required this.userModel, @required this.notifyParent})
+  StudentDetail({Key key, @required this.userModel, @required this.notifyParent, @required this.studentId})
       : super(key: key);
 
   @override
-  _StudentsState createState() => _StudentsState();
+  _StudentDetailState createState() => _StudentDetailState();
 }
 
-class _StudentsState extends State<Students> {
+class _StudentDetailState extends State<StudentDetail> {
   bool requesting = false;
-  Future<List<StudentInfo>> students;
+  Future<StudentInfo> student;
 
   void _ackAlert(
       {BuildContext context,
@@ -52,13 +53,14 @@ class _StudentsState extends State<Students> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<StudentViewModel>(
+    return BaseView<StudentDetailViewModel>(
         onModelReady: (model) { 
-          model.getStudents(
+          model.showStudent(
             username: widget.userModel.userInfo.username,
             token: widget.userModel.userInfo.token,
+            studentId: widget.studentId,
             resultFunction: (val) {
-              students = Future.value(model.students);
+              // students = Future.value(model.students);
             },
             errorFunction: (error) {
               widget.userModel.tokenTimeout(error);
@@ -88,29 +90,12 @@ class _StudentsState extends State<Students> {
                         alignment: Alignment.topCenter,
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
                         child: Text(
-                          'Student\'s list',
-                          style: TextStyle(height: 1, fontSize: 25))
+                          '${model.student.name}',
+                          style: TextStyle(height: 1, fontSize: 20))
                         ),
                     Divider(
                       color: Colors.black,
                     ),
-                    Expanded(
-                        child: FutureBuilder<List<StudentInfo>>(
-                          future: students,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return _list(snapshot.data);
-                            } else if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
-
-                            // By default, show a loading spinner.
-                            // return CircularProgressIndicator();
-                            return Center(
-                              child: Text('There are no students available yet!')
-                            );
-                          },
-                        )),
                   ],
                 )),
         drawer: DrawerMenu(userModel: widget.userModel,),
@@ -248,11 +233,6 @@ class _StudentsState extends State<Students> {
                 onTap: () {
                   // print("${notes[position]} clicked");
                   // _onTap(context, element, position);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => StudentDetail(userModel: widget.userModel, studentId: '${element.id}', notifyParent: () {})),
-                  );
                 },
                 child: ListTile(
                   leading: Icon(Icons.school, size: 50),

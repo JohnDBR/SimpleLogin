@@ -132,7 +132,7 @@ class Api {
     print('${response.statusCode}');
     if (response.statusCode == 200) {
       print("Course show was done successfully");
-      return CourseInfo.fromCreate(json.decode(response.body));
+      return CourseInfo.fromView(json.decode(response.body));
     } else {
       print("Course show failed");
       throw Exception(response.body);
@@ -195,7 +195,7 @@ class Api {
     print('${response.statusCode}');
     if (response.statusCode == 200) {
       print("Student show was done successfully");
-      return StudentInfo.fromCreate(json.decode(response.body));
+      return StudentInfo.fromView(json.decode(response.body));
     } else {
       print("Student show failed");
       throw Exception(response.body);

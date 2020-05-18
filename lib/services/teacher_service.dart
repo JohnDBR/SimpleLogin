@@ -9,7 +9,7 @@ class TeacherService {
   TeacherInfo _teacher;
 
   List<TeacherInfo> get teachers => _teachers;
-  TeacherInfo get teacher => teacher;
+  TeacherInfo get teacher => _teacher;
 
   Future getTeachers({String username, String token}) async {
     try {

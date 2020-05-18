@@ -4,6 +4,7 @@ import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/models/teacher_info.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/viewmodels/teacher_view_model.dart';
+import 'package:login_flutter/widgets/teacher_detail.dart';
 import 'package:provider/provider.dart';
 
 import 'drawer_menu.dart';
@@ -60,6 +61,7 @@ class _StudentsState extends State<Teachers> {
               teachers = Future.value(model.teachers);
             },
             errorFunction: (error) {
+              widget.userModel.tokenTimeout(error);
               return _ackAlert(
                 context: _scaffoldKey.currentContext,
                 title: 'Error',
@@ -249,6 +251,11 @@ class _StudentsState extends State<Teachers> {
                 onTap: () {
                   // print("${notes[position]} clicked");
                   // _onTap(context, element, position);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TeacherDetail(userModel: widget.userModel, teacherId: '${element.id}', notifyParent: () {})),
+                  );
                 },
                 child: ListTile(
                   leading: Icon(Icons.school, size: 50),

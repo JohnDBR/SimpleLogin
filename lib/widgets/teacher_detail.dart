@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
-import 'package:login_flutter/models/student_info.dart';
+import 'package:login_flutter/models/teacher_info.dart';
 import 'package:login_flutter/models/user_model.dart';
-import 'package:login_flutter/viewmodels/student_view_model.dart';
-import 'package:login_flutter/widgets/student_detail.dart';
+import 'package:login_flutter/viewmodels/teacher_detail_view_model.dart';
 import 'package:provider/provider.dart';
 
 import 'drawer_menu.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class Students extends StatefulWidget {
+class TeacherDetail extends StatefulWidget {
   final UserModel userModel;
   final Function() notifyParent;
+  final String teacherId;
 
-  Students({Key key, @required this.userModel, @required this.notifyParent})
+  TeacherDetail({Key key, @required this.userModel, @required this.notifyParent, @required this.teacherId})
       : super(key: key);
 
   @override
-  _StudentsState createState() => _StudentsState();
+  _TeacherDetailState createState() => _TeacherDetailState();
 }
 
-class _StudentsState extends State<Students> {
+class _TeacherDetailState extends State<TeacherDetail> {
   bool requesting = false;
-  Future<List<StudentInfo>> students;
 
   void _ackAlert(
       {BuildContext context,
@@ -52,13 +51,14 @@ class _StudentsState extends State<Students> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<StudentViewModel>(
+    return BaseView<TeacherDetailViewModel>(
         onModelReady: (model) { 
-          model.getStudents(
+          model.showTeacher(
             username: widget.userModel.userInfo.username,
             token: widget.userModel.userInfo.token,
+            teacherId: widget.teacherId,
             resultFunction: (val) {
-              students = Future.value(model.students);
+              // teachers = Future.value(model.teachers);
             },
             errorFunction: (error) {
               widget.userModel.tokenTimeout(error);
@@ -77,7 +77,7 @@ class _StudentsState extends State<Students> {
         },
         builder: (context, model, child) => Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(title: Text('Students')),
+        appBar: AppBar(title: Text('Home')),
         body: model.state == ViewState.Busy
                 ? Center(child: CircularProgressIndicator())
                 : Container(
@@ -88,32 +88,15 @@ class _StudentsState extends State<Students> {
                         alignment: Alignment.topCenter,
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
                         child: Text(
-                          'Student\'s list',
-                          style: TextStyle(height: 1, fontSize: 25))
+                          '${model.teacher.name}',
+                          style: TextStyle(height: 1, fontSize: 20))
                         ),
                     Divider(
                       color: Colors.black,
                     ),
-                    Expanded(
-                        child: FutureBuilder<List<StudentInfo>>(
-                          future: students,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return _list(snapshot.data);
-                            } else if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
-
-                            // By default, show a loading spinner.
-                            // return CircularProgressIndicator();
-                            return Center(
-                              child: Text('There are no students available yet!')
-                            );
-                          },
-                        )),
                   ],
                 )),
-        drawer: DrawerMenu(userModel: widget.userModel,),
+        drawer: DrawerMenu(userModel: widget.userModel),
         // floatingActionButton: Consumer<UserModel>(
         //     //                  <--- Consumer
         //     builder: (context, userModel, child) {
@@ -145,12 +128,13 @@ class _StudentsState extends State<Students> {
         //           onPressed: () {
         //             if (!requesting) {
         //               requesting = true;
-        //               model.addStudent(
+        //               debugPrint("HOLAAAAA");
+        //               model.addTeacher(
         //                 username: widget.userModel.userInfo.username,
         //                 token: widget.userModel.userInfo.token,
         //                 resultFunction: (val) {
         //                   setState(() {
-        //                     students = Future.value(model.students);
+        //                     teacher = Future.value(model.teachers);
         //                   });
         //                   requesting = false;
         //                   return _ackAlert(
@@ -159,6 +143,7 @@ class _StudentsState extends State<Students> {
         //                     message: 'You have successfuly created a course!');
         //                 },
         //                 errorFunction: (error) {
+        //                   debugPrint("HOLAAAAA");
         //                   requesting = false;
         //                   return _ackAlert(
         //                     context: context,
@@ -166,6 +151,7 @@ class _StudentsState extends State<Students> {
         //                     message: error.toString());
         //                 },
         //                 timeoutFunction: () {
+        //                   debugPrint("HOLAAAAA");
         //                   requesting = false;
         //                   return _ackAlert(
         //                     context: context,
@@ -185,8 +171,8 @@ class _StudentsState extends State<Students> {
         ));
   }
 
-  Widget _list(List<StudentInfo> courses) {
-    return courses.isEmpty ? Center(child: Text('There are no students available yet!')
+  Widget _list(List<TeacherInfo> courses) {
+    return courses.isEmpty ? Center(child: Text('There are no teachers available yet!')
       ) : ListView.builder(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
       itemCount: courses.length,
@@ -197,7 +183,7 @@ class _StudentsState extends State<Students> {
     );
   }
 
-  Widget _item(StudentInfo element, int position) {
+  Widget _item(TeacherInfo element, int position) {
     return Dismissible(
         background: _backgroundSlide(),
         key: UniqueKey(),
@@ -248,11 +234,6 @@ class _StudentsState extends State<Students> {
                 onTap: () {
                   // print("${notes[position]} clicked");
                   // _onTap(context, element, position);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => StudentDetail(userModel: widget.userModel, studentId: '${element.id}', notifyParent: () {})),
-                  );
                 },
                 child: ListTile(
                   leading: Icon(Icons.school, size: 50),
