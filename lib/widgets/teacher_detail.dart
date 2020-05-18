@@ -102,7 +102,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                                       AppBar().preferredSize.height) /
                                   10,
                               child: Text('${model.teacher.name}',
-                                  style: TextStyle(height: 1, fontSize: 20))), Divider(
+                                  style: TextStyle(height: 3, fontSize: 25))), Divider(
                             color: Colors.black,
                           ),
                           Container(
@@ -111,7 +111,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                                       AppBar().preferredSize.height) /
                                   10,
                               child: Text('${model.teacher.email}',
-                                  style: TextStyle(height: 1, fontSize: 20))), Divider(
+                                  style: TextStyle(height: 3, fontSize: 25))), Divider(
                             color: Colors.black,
                           ),
                           Container(
@@ -120,7 +120,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                                       AppBar().preferredSize.height) /
                                   10,
                               child: Text("ID : " + '${model.teacher.id}',
-                                  style: TextStyle(height: 1, fontSize: 20))),
+                                  style: TextStyle(height: 3, fontSize: 25))),
                           Divider(
                             color: Colors.black,
                           ),
