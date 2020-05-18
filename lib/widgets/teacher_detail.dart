@@ -89,12 +89,14 @@ class _TeacherDetailState extends State<TeacherDetail> {
                   : Container(
                       margin: const EdgeInsets.all(0),
                       child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        MainAxisAlignment : MainAxisAlignment.SpaceEvenly , 
                         children: <Widget>[
                          Container(
                             alignment: Alignment.topLeft,
                             width: 100.0,
                             height: 100.0,
-                            child: Icon(Icons.person , size: 100),
+                            child: Icon(Icons.person_outline , size: 200),
                           ),
                           Container(
                               alignment: Alignment.topCenter,
@@ -106,7 +108,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                             color: Colors.black,
                           ),
                           Container(
-                              alignment: Alignment(0.0, -0.85),
+                              alignment: Alignment(0.0, -0.87),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
@@ -115,7 +117,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                             color: Colors.black,
                           ),
                           Container(
-                              alignment: Alignment(0.0, -0.75),
+                              alignment: Alignment(0.0, -0.77),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
@@ -125,7 +127,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                             color: Colors.black,
                           ),
                           Container(
-                              alignment: Alignment(0.0, -0.65),
+                              alignment: Alignment(0.0, -0.67),
                               height: (MediaQuery.of(context).size.height -
                                       AppBar().preferredSize.height) /
                                   10,
