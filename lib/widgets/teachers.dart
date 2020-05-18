@@ -77,7 +77,7 @@ class _StudentsState extends State<Teachers> {
         },
         builder: (context, model, child) => Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(title: Text('Home')),
+        appBar: AppBar(title: Text('Teachers')),
         body: model.state == ViewState.Busy
                 ? Center(child: CircularProgressIndicator())
                 : Container(
@@ -228,7 +228,7 @@ class _StudentsState extends State<Teachers> {
                           style: TextStyle(color: Colors.red),
                         ),
                         onPressed: () {
-                          // There is not an actual endpoint to desroy a course!...
+                          // There is not an actual endpoint to destroy a course!...
                           setState(() {
                             // courses.data.removeAt(position);
                           });

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/models/course_info.dart';
+import 'package:login_flutter/models/student_info.dart';
 import 'package:login_flutter/viewmodels/course_detail_view_model.dart';
-import 'package:login_flutter/viewmodels/home_view_model.dart';
-import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
+import 'package:login_flutter/widgets/student_detail.dart';
+import 'package:provider/provider.dart';
 
 import 'drawer_menu.dart';
 
@@ -25,6 +26,7 @@ class CourseDetail extends StatefulWidget {
 
 class _CourseDetailState extends State<CourseDetail> {
   bool requesting = false;
+  Future<List<StudentInfo>> students;
 
   void _ackAlert(
       {BuildContext context,
@@ -59,7 +61,7 @@ class _CourseDetailState extends State<CourseDetail> {
             token: widget.userModel.userInfo.token,
             courseId: widget.courseId,
             resultFunction: (val) {
-              // course = Future.value(model.course);
+              students = Future.value(model.course.studentsInfo);
             },
             errorFunction: (error) {
               widget.userModel.tokenTimeout(error);
@@ -78,7 +80,7 @@ class _CourseDetailState extends State<CourseDetail> {
         },
         builder: (context, model, child) => Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(title: Text('Home')),
+        appBar: AppBar(title: Text('Course Detail')),
         body: model.state == ViewState.Busy
                 ? Center(child: CircularProgressIndicator())
                 : Container(
@@ -95,113 +97,155 @@ class _CourseDetailState extends State<CourseDetail> {
                     Divider(
                       color: Colors.black,
                     ),
-                    // Expanded(
-                    //     child: FutureBuilder<List<CourseInfo>>(
-                    //       future: courses,
-                    //       builder: (context, snapshot) {
-                    //         if (snapshot.hasData) {
-                    //           return _list(snapshot.data);
-                    //         } else if (snapshot.hasError) {
-                    //           return Text("${snapshot.error}");
-                    //         }
+                    Container(
+                        alignment: Alignment.topCenter,
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        child: Text(
+                          'Teacher\'s info',
+                          style: TextStyle(height: 1, fontSize: 25))
+                        ),
+                    Container(
+                        alignment: Alignment.topCenter,
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        child: Text(
+                          '${model.course.teacherInfo.name}',
+                          style: TextStyle(height: 1, fontSize: 15))
+                        ),
+                    Container(
+                        alignment: Alignment.topCenter,
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        child: Text(
+                          '${model.course.teacherInfo.email}',
+                          style: TextStyle(height: 1, fontSize: 15))
+                        ),
+                    Container(
+                        alignment: Alignment.topCenter,
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        child: Text(
+                          '${model.course.teacherInfo.username}',
+                          style: TextStyle(height: 1, fontSize: 15))
+                        ),
+                    Divider(
+                      color: Colors.black,
+                    ),
+                    Container(
+                        alignment: Alignment.topCenter,
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        child: Text(
+                          'Student\'s list',
+                          style: TextStyle(height: 1, fontSize: 25))
+                        ),
+                    Divider(
+                      color: Colors.black,
+                    ),
+                    Expanded(
+                        child: FutureBuilder<List<StudentInfo>>(
+                          future: students,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return _list(snapshot.data);
+                            } else if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
 
-                    //         // By default, show a loading spinner.
-                    //         // return CircularProgressIndicator();
-                    //         return Center(
-                    //           child: Text('There are no courses available yet!')
-                    //         );
-                    //       },
-                    //     )),
+                            // By default, show a loading spinner.
+                            // return CircularProgressIndicator();
+                            return Center(
+                              child: Text('There are no students available yet!')
+                            );
+                          },
+                        )),
                   ],
                 )),
         drawer: DrawerMenu(userModel: widget.userModel),
-        // floatingActionButton: Consumer<UserModel>(
-        //     //                  <--- Consumer
-        //     builder: (context, userModel, child) {
-        //   return Stack(
-        //     children: <Widget>[
-        //       Align(
-        //         alignment: Alignment.bottomLeft,
-        //         child: Container(
-        //           padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
-        //           child: Consumer<UserModel>(
-        //         //                  <--- Consumer
-        //         builder: (context, userModel, child) {
-        //         return FloatingActionButton.extended(
-        //           heroTag: "logout_btn",
-        //           onPressed: () {
-        //             userModel.logout();
-        //             setState(() {
-        //               widget.notifyParent();
-        //             });
-        //           },
-        //           icon: Icon(Icons.power_settings_new),
-        //           label: Text('Logout',
-        //               style: TextStyle(height: 1, fontSize: 25)),
-        //         );
-        //       })
-        //       )),
-        //       Align(
-        //         alignment: Alignment.bottomRight,
-        //         child: new FloatingActionButton(
-        //           heroTag: "add_course_btn",
-        //           onPressed: () {
-        //             if (!requesting) {
-        //               requesting = true;
-        //               model.addCourse(
-        //                 username: widget.userModel.userInfo.username,
-        //                 token: widget.userModel.userInfo.token,
-        //                 resultFunction: (val) {
-        //                   setState(() {
-        //                     courses = Future.value(model.courses);
-        //                   });
-        //                   requesting = false;
-        //                   return _ackAlert(
-        //                     context: context,
-        //                     title: 'SignIn',
-        //                     message: 'You have successfuly created a course!');
-        //                 },
-        //                 errorFunction: (error) {            
-        //                   widget.userModel.tokenTimeout(error);
-        //                   requesting = false;
-        //                   return _ackAlert(
-        //                     context: context,
-        //                     title: 'Error',
-        //                     message: error.toString());
-        //                 },
-        //                 timeoutFunction: () {
-        //                   requesting = false;
-        //                   return _ackAlert(
-        //                     context: context,
-        //                     title: 'Error',
-        //                     message: 'Timeout > 10secs');
-        //                 }
-        //               );
-        //             }
-        //           },
-        //           tooltip: 'Add course',
-        //           child: new Icon(Icons.add)
-        //         )
-        //       ),
-        //     ],
-        //   );
-        // })
+        floatingActionButton: Consumer<UserModel>(
+            //                  <--- Consumer
+            builder: (context, userModel, child) {
+          return Stack(
+            children: <Widget>[
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
+                  child: Consumer<UserModel>(
+                //                  <--- Consumer
+                builder: (context, userModel, child) {
+                return FloatingActionButton.extended(
+                  heroTag: "logout_btn",
+                  onPressed: () {
+                    userModel.logout();
+                    setState(() {
+                      widget.notifyParent();
+                    });
+                  },
+                  icon: Icon(Icons.power_settings_new),
+                  label: Text('Logout',
+                      style: TextStyle(height: 1, fontSize: 25)),
+                );
+              })
+              )),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: new FloatingActionButton(
+                  heroTag: "add_student_btn",
+                  onPressed: () {
+                    if (!requesting) {
+                      requesting = true;
+                      model.addStudent(
+                        username: widget.userModel.userInfo.username,
+                        token: widget.userModel.userInfo.token,
+                        courseId: '${model.course.id}',
+                        resultFunction: (val) {
+                          setState(() {
+                            //  
+                          });
+                          requesting = false;
+                          return _ackAlert(
+                            context: context,
+                            title: 'SignIn',
+                            message: 'You have successfuly created a course!');
+                        },
+                        errorFunction: (error) {            
+                          widget.userModel.tokenTimeout(error);
+                          requesting = false;
+                          return _ackAlert(
+                            context: context,
+                            title: 'Error',
+                            message: error.toString());
+                        },
+                        timeoutFunction: () {
+                          requesting = false;
+                          return _ackAlert(
+                            context: context,
+                            title: 'Error',
+                            message: 'Timeout > 10secs');
+                        }
+                      );
+                    }
+                  },
+                  tooltip: 'Add course',
+                  child: new Icon(Icons.add)
+                )
+              ),
+            ],
+          );
+        })
         ));
   }
 
-  Widget _list(List<CourseInfo> courses) {
-    return courses.isEmpty ? Center(child: Text('There are no courses available yet!')
+  Widget _list(List<StudentInfo> students) {
+    return students.isEmpty ? Center(child: Text('There are no courses available yet!')
       ) : ListView.builder(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
-      itemCount: courses.length,
+      itemCount: students.length,
       itemBuilder: (context, position) {
-        var element = courses[position];
+        var element = students[position];
         return _item(element, position);
       },
     );
   }
 
-  Widget _item(CourseInfo element, int position) {
+  Widget _item(StudentInfo element, int position) {
     return Dismissible(
         background: _backgroundSlide(),
         key: UniqueKey(),
@@ -252,11 +296,16 @@ class _CourseDetailState extends State<CourseDetail> {
                 onTap: () {
                   // print("${notes[position]} clicked");
                   // _onTap(context, element, position);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => StudentDetail(userModel: widget.userModel, studentId: '${element.id}', notifyParent: () {})),
+                  );
                 },
                 child: ListTile(
                   leading: Icon(Icons.school, size: 50),
                   title: Text(element.name),
-                  subtitle: Text(element.professor),
+                  subtitle: Text(element.email),
                 ))));
   }
 

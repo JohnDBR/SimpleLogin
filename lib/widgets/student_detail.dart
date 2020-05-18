@@ -79,7 +79,7 @@ class _StudentDetailState extends State<StudentDetail> {
         },
         builder: (context, model, child) => Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(title: Text('Students')),
+        appBar: AppBar(title: Text('Student Detail')),
         body: model.state == ViewState.Busy
                 ? Center(child: CircularProgressIndicator())
                 : Container(
