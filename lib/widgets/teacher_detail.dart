@@ -88,13 +88,10 @@ class _TeacherDetailState extends State<TeacherDetail> {
                       child: Column(
                         children: <Widget>[
                           Container(
-                            child: Card(ListTile(
-                              leading: Icon(Icons.people, size: 50),
-                              title: Text('${model.course.teacherInfo.name}'),
-                              subtitle:
-                                  Text('${model.course.teacherInfo.email}'),
-                            )),
-                          ),
+                              alignment: Alignment.topCenter,
+                              padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                              child: Text('${model.teacher.name}',
+                                  style: TextStyle(height: 1, fontSize: 20))),
                           Divider(
                             color: Colors.black,
                           ),

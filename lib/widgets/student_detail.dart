@@ -90,12 +90,10 @@ class _StudentDetailState extends State<StudentDetail> {
                       child: Column(
                         children: <Widget>[
                           Container(
-                            child: Card(ListTile(
-                              leading: Icon(Icons.people, size: 50),
-                              title: Text('${model.student.name}'),
-                              subtitle: Text('${model.student.email}'),
-                            )),
-                          ),
+                              alignment: Alignment.topCenter,
+                              padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                              child: Text('${model.student.name}',
+                                  style: TextStyle(height: 1, fontSize: 20))),
                           Divider(
                             color: Colors.black,
                           ),
