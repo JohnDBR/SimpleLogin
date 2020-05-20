@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
-import 'package:login_flutter/models/course_info.dart';
 import 'package:login_flutter/models/student_info.dart';
 import 'package:login_flutter/viewmodels/course_detail_view_model.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/widgets/student_detail.dart';
 import 'package:provider/provider.dart';
 
-import 'drawer_menu.dart';
-
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class CourseDetail extends StatefulWidget {
   final UserModel userModel;
@@ -44,6 +41,10 @@ class _CourseDetailState extends State<CourseDetail> {
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
+                if (redirect) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  widget.notifyParent();  
+                }
               },
             ),
           ],
@@ -64,11 +65,11 @@ class _CourseDetailState extends State<CourseDetail> {
               students = Future.value(model.course.studentsInfo);
             },
             errorFunction: (error) {
-              widget.userModel.tokenTimeout(error);
               return _ackAlert(
                 context: _scaffoldKey.currentContext,
                 title: 'Error',
-                message: error.toString());
+                message: error.toString(),
+                redirect: widget.userModel.tokenTimeout(error));
             },
             timeoutFunction: () {
               return _ackAlert(
@@ -167,7 +168,7 @@ class _CourseDetailState extends State<CourseDetail> {
                         )),
                   ],
                 )),
-        drawer: DrawerMenu(userModel: widget.userModel),
+        // drawer: DrawerMenu(userModel: widget.userModel),
         floatingActionButton: Consumer<UserModel>(
             //                  <--- Consumer
             builder: (context, userModel, child) {
@@ -197,12 +198,12 @@ class _CourseDetailState extends State<CourseDetail> {
                             message: 'You have successfuly created a course!');
                         },
                         errorFunction: (error) {         
-                          requesting = false;   
-                          widget.userModel.tokenTimeout(error);
+                          requesting = false;                          
                           return _ackAlert(
                             context: context,
                             title: 'Error',
-                            message: error.toString());
+                            message: error.toString(),
+                            redirect: widget.userModel.tokenTimeout(error));
                         },
                         timeoutFunction: () {
                           requesting = false;
@@ -290,7 +291,7 @@ class _CourseDetailState extends State<CourseDetail> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => StudentDetail(userModel: widget.userModel, studentId: '${element.id}', notifyParent: () {})),
+                        builder: (context) => StudentDetail(userModel: widget.userModel, studentId: '${element.id}', notifyParent: widget.notifyParent)),
                   );
                 },
                 child: ListTile(

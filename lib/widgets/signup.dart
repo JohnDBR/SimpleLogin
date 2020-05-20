@@ -4,7 +4,7 @@ import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/viewmodels/signup_view_model.dart';
 import 'package:login_flutter/models/user_model.dart';
 
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class SignUp extends StatelessWidget {
   final UserModel userModel;

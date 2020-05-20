@@ -4,12 +4,8 @@ import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/models/student_info.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/viewmodels/student_detail_view_model.dart';
-import 'package:login_flutter/viewmodels/student_view_model.dart';
-import 'package:provider/provider.dart';
 
-import 'drawer_menu.dart';
-
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class StudentDetail extends StatefulWidget {
   final UserModel userModel;
@@ -47,6 +43,10 @@ class _StudentDetailState extends State<StudentDetail> {
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
+                if (redirect) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  widget.notifyParent();  
+                }
               },
             ),
           ],
@@ -67,11 +67,11 @@ class _StudentDetailState extends State<StudentDetail> {
                 // students = Future.value(model.students);
               },
               errorFunction: (error) {
-                widget.userModel.tokenTimeout(error);
                 return _ackAlert(
                     context: _scaffoldKey.currentContext,
                     title: 'Error',
-                    message: error.toString());
+                    message: error.toString(),
+                    redirect: widget.userModel.tokenTimeout(error));
               },
               timeoutFunction: () {
                 return _ackAlert(
@@ -144,9 +144,9 @@ class _StudentDetailState extends State<StudentDetail> {
                           ),
                         ],
                       )),
-              drawer: DrawerMenu(
-                userModel: widget.userModel,
-              ),
+              // drawer: DrawerMenu(
+              //   userModel: widget.userModel,
+              // ),
               // floatingActionButton: Consumer<UserModel>(
               //     //                  <--- Consumer
               //     builder: (context, userModel, child) {

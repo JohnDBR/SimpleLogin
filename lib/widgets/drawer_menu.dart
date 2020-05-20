@@ -5,8 +5,54 @@ import 'package:login_flutter/widgets/teachers.dart';
 
 class DrawerMenu extends StatelessWidget {
   final UserModel userModel;
+  final String screen;
+  final Function() notifyParent;
 
-  DrawerMenu({Key key, @required this.userModel}) : super(key: key);
+  DrawerMenu({Key key, @required this.userModel, @required this.screen, @required this.notifyParent}) : super(key: key);
+
+  void navigate(BuildContext context, String destiny) {
+    if (destiny == 'Courses') {
+      if (screen == 'Courses') {
+        Navigator.of(context).pop(); // Drawer pop!
+      } else if (screen == 'Students' || screen == 'Teachers') {
+        Navigator.of(context).pop(); // Drawer pop!
+        Navigator.of(context).pop(); // Stack pop!
+        Navigator.of(context).pop(); // Destiny Drawer pop!
+      }
+    } else if (destiny == 'Students') {
+      if (screen == 'Courses') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) =>  Students(userModel: userModel, notifyParent: notifyParent)));
+      } else if (screen == 'Teachers') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            settings: RouteSettings(name: "Students"),
+            builder: (context) => Students(userModel: userModel, notifyParent: notifyParent)
+          ),
+        );
+      } else {
+        Navigator.of(context).pop(); // Drawer pop!
+      }
+    } else if (destiny == 'Teachers') {
+      if (screen == 'Courses') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) =>  Teachers(userModel: userModel, notifyParent: notifyParent)));
+      } else if (screen == 'Students') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            settings: RouteSettings(name: "Teachers"),
+            builder: (context) => Teachers(userModel: userModel, notifyParent: notifyParent)
+          ),
+        );
+      } else {
+        Navigator.of(context).pop(); // Drawer pop!
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +69,7 @@ class DrawerMenu extends StatelessWidget {
           ListTile(
             title: Text('Courses'),
             onTap: () {
-              // Navigator.of(context).pop();
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                "MainPage",
-                (route) => route.isCurrent && route.settings.name == "MainPage"
-                    ? false
-                    : true);
-              // Navigator.of(context).push(MaterialPageRoute(
-              //     builder: (BuildContext context) => MainPage()));
+              navigate(context, 'Courses');
             },
           ),
           Divider(
@@ -39,21 +78,7 @@ class DrawerMenu extends StatelessWidget {
           ListTile(
             title: Text('Students'),
             onTap: () {
-              // Navigator.of(context).pop();
-              // Navigator.of(context).pushNamedAndRemoveUntil(
-              //   "Students",
-              //   (route) => route.isCurrent && route.settings.name == "Students"
-              //       ? false
-              //       : true);
-
-              // Navigator.of(context).push(MaterialPageRoute(
-              //     builder: (BuildContext context) => Students(userModel: userModel, notifyParent: () {})));
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Students(userModel: userModel, notifyParent: () {})),
-              );
+              navigate(context, 'Students');
             },
           ),
           Divider(
@@ -62,23 +87,18 @@ class DrawerMenu extends StatelessWidget {
           ListTile(
             title: Text('Teachers'),
             onTap: () {
-              // Navigator.of(context).pop();
-              // Navigator.of(context).pushNamedAndRemoveUntil(
-              //   "Teachers",
-              //   (route) => route.isCurrent && route.settings.name == "Teachers"
-              //       ? false
-              //       : true);
-
-              // Navigator.of(context).push(MaterialPageRoute(
-              //     builder: (BuildContext context) => Teachers(userModel: userModel, notifyParent: () {})));
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Teachers(userModel: userModel, notifyParent: () {})),
-              );
+              navigate(context, 'Teachers');
             }
-          )
+          ),
+          // Divider(
+          //   color: Colors.black,
+          // ),
+          // ListTile(
+          //   title: Text('Teachers'),
+          //   onTap: () {
+          //     Navigator.of(context).popUntil((route) => route.isFirst);
+          //   }
+          // )                
         ],
       ),
     );

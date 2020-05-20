@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/widgets/signup.dart';
 
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class SignIn extends StatefulWidget {
   final UserModel userModel;
@@ -31,6 +31,7 @@ class _SignInState extends State<SignIn> {
   @override
   void initState() {
     super.initState();
+    _scaffoldKey = GlobalKey<ScaffoldState>();
     _retrieveRememberMe();    
   }
 

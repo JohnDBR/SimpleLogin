@@ -5,11 +5,10 @@ import 'package:login_flutter/models/student_info.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/viewmodels/student_view_model.dart';
 import 'package:login_flutter/widgets/student_detail.dart';
-import 'package:provider/provider.dart';
 
 import 'drawer_menu.dart';
 
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class Students extends StatefulWidget {
   final UserModel userModel;
@@ -42,6 +41,10 @@ class _StudentsState extends State<Students> {
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
+                if (redirect) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  widget.notifyParent();
+                }
               },
             ),
           ],
@@ -61,11 +64,11 @@ class _StudentsState extends State<Students> {
               students = Future.value(model.students);
             },
             errorFunction: (error) {
-              widget.userModel.tokenTimeout(error);
               return _ackAlert(
                 context: _scaffoldKey.currentContext,
                 title: 'Error',
-                message: error.toString());
+                message: error.toString(),
+                redirect: widget.userModel.tokenTimeout(error));
             },
             timeoutFunction: () {
               return _ackAlert(
@@ -113,7 +116,7 @@ class _StudentsState extends State<Students> {
                         )),
                   ],
                 )),
-        drawer: DrawerMenu(userModel: widget.userModel,),
+        drawer: DrawerMenu(userModel: widget.userModel, screen: 'Students', notifyParent: widget.notifyParent),
         // floatingActionButton: Consumer<UserModel>(
         //     //                  <--- Consumer
         //     builder: (context, userModel, child) {
@@ -251,7 +254,7 @@ class _StudentsState extends State<Students> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => StudentDetail(userModel: widget.userModel, studentId: '${element.id}', notifyParent: () {})),
+                        builder: (context) => StudentDetail(userModel: widget.userModel, studentId: '${element.id}', notifyParent: widget.notifyParent)),
                   );
                 },
                 child: ListTile(

@@ -9,7 +9,7 @@ import 'package:login_flutter/models/user_model.dart';
 
 import 'drawer_menu.dart';
 
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class Home extends StatefulWidget {
   final UserModel userModel;
@@ -25,6 +25,12 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool requesting = false;
   Future<List<CourseInfo>> courses;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaffoldKey = new GlobalKey<ScaffoldState>();
+  }
 
   void _ackAlert(
       {BuildContext context,
@@ -42,6 +48,9 @@ class _HomeState extends State<Home> {
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
+                if (redirect) {
+                  widget.notifyParent();
+                }
               },
             ),
           ],
@@ -61,11 +70,11 @@ class _HomeState extends State<Home> {
               courses = Future.value(model.courses);
             },
             errorFunction: (error) {
-              widget.userModel.tokenTimeout(error);
               return _ackAlert(
                 context: _scaffoldKey.currentContext,
                 title: 'Error',
-                message: error.toString());
+                message: error.toString(),
+                redirect: widget.userModel.tokenTimeout(error));
             },
             timeoutFunction: () {
               return _ackAlert(
@@ -113,7 +122,7 @@ class _HomeState extends State<Home> {
                         )),
                   ],
                 )),
-        drawer: DrawerMenu(userModel: widget.userModel),
+        drawer: DrawerMenu(userModel: widget.userModel, screen: 'Courses', notifyParent: widget.notifyParent),
         floatingActionButton: Consumer<UserModel>(
             //                  <--- Consumer
             builder: (context, userModel, child) {
@@ -161,12 +170,12 @@ class _HomeState extends State<Home> {
                             message: 'You have successfuly created a course!');
                         },
                         errorFunction: (error) {            
-                          widget.userModel.tokenTimeout(error);
                           requesting = false;
                           return _ackAlert(
                             context: context,
                             title: 'Error',
-                            message: error.toString());
+                            message: error.toString(),
+                            redirect: widget.userModel.tokenTimeout(error));
                         },
                         timeoutFunction: () {
                           requesting = false;
@@ -253,7 +262,7 @@ class _HomeState extends State<Home> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => CourseDetail(userModel: widget.userModel, courseId: '${element.id}', notifyParent: () {})),
+                        builder: (context) => CourseDetail(userModel: widget.userModel, courseId: '${element.id}', notifyParent: widget.notifyParent)),
                   );
                 },
                 child: ListTile(

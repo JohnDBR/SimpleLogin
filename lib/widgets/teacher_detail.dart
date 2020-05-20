@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
 import 'package:login_flutter/models/teacher_info.dart';
 import 'package:login_flutter/models/user_model.dart';
 import 'package:login_flutter/viewmodels/teacher_detail_view_model.dart';
-import 'package:provider/provider.dart';
 
-import 'drawer_menu.dart';
-
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class TeacherDetail extends StatefulWidget {
   final UserModel userModel;
@@ -48,6 +43,10 @@ class _TeacherDetailState extends State<TeacherDetail> {
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
+                if (redirect) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  widget.notifyParent();  
+                }
               },
             ),
           ],
@@ -68,11 +67,11 @@ class _TeacherDetailState extends State<TeacherDetail> {
                 // teachers = Future.value(model.teachers);
               },
               errorFunction: (error) {
-                widget.userModel.tokenTimeout(error);
                 return _ackAlert(
                     context: _scaffoldKey.currentContext,
                     title: 'Error',
-                    message: error.toString());
+                    message: error.toString(),
+                    redirect: widget.userModel.tokenTimeout(error));
               },
               timeoutFunction: () {
                 return _ackAlert(
@@ -139,7 +138,7 @@ class _TeacherDetailState extends State<TeacherDetail> {
                           ),
                         ],
                       )),
-              drawer: DrawerMenu(userModel: widget.userModel),
+              // drawer: DrawerMenu(userModel: widget.userModel),
               // floatingActionButton: Consumer<UserModel>(
               //     //                  <--- Consumer
               //     builder: (context, userModel, child) {

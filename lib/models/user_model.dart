@@ -50,10 +50,12 @@ class UserModel extends ChangeNotifier {
   }
 
   // Error handler methods!
-  void tokenTimeout(String error) {
+  bool tokenTimeout(String error) {
     if (json.decode(error.split('Exception:').last)['error'] == 'Token inválido.') {
       logout();
+      return true;
     }
+    return false;
   }
 
   // Shared Preferences methods!
