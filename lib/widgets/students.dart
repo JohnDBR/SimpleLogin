@@ -1,36 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
-import 'package:login_flutter/models/course_info.dart';
-import 'package:login_flutter/viewmodels/home_view_model.dart';
-import 'package:login_flutter/widgets/course_detail.dart';
-import 'package:provider/provider.dart';
+import 'package:login_flutter/models/student_info.dart';
 import 'package:login_flutter/models/user_model.dart';
+import 'package:login_flutter/viewmodels/student_view_model.dart';
+import 'package:login_flutter/widgets/student_detail.dart';
 
 import 'drawer_menu.dart';
 
 GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class Home extends StatefulWidget {
+class Students extends StatefulWidget {
   final UserModel userModel;
   final Function() notifyParent;
 
-  Home({Key key, @required this.userModel, @required this.notifyParent})
+  Students({Key key, @required this.userModel, @required this.notifyParent})
       : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _StudentsState createState() => _StudentsState();
 }
 
-class _HomeState extends State<Home> {
+class _StudentsState extends State<Students> {
   bool requesting = false;
-  Future<List<CourseInfo>> courses;
-
-  @override
-  void initState() {
-    super.initState();
-    _scaffoldKey = new GlobalKey<ScaffoldState>();
-  }
+  Future<List<StudentInfo>> students;
 
   void _ackAlert(
       {BuildContext context,
@@ -49,6 +42,7 @@ class _HomeState extends State<Home> {
               onPressed: () {
                 Navigator.of(context).pop();
                 if (redirect) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                   widget.notifyParent();
                 }
               },
@@ -61,13 +55,13 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<HomeViewModel>(
+    return BaseView<StudentViewModel>(
         onModelReady: (model) { 
-          model.getCourses(
+          model.getStudents(
             username: widget.userModel.userInfo.username,
             token: widget.userModel.userInfo.token,
             resultFunction: (val) {
-              courses = Future.value(model.courses);
+              students = Future.value(model.students);
             },
             errorFunction: (error) {
               return _ackAlert(
@@ -86,7 +80,7 @@ class _HomeState extends State<Home> {
         },
         builder: (context, model, child) => Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(title: Text('Home')),
+        appBar: AppBar(title: Text('Students')),
         body: model.state == ViewState.Busy
                 ? Center(child: CircularProgressIndicator())
                 : Container(
@@ -97,15 +91,15 @@ class _HomeState extends State<Home> {
                         alignment: Alignment.topCenter,
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
                         child: Text(
-                          '${widget.userModel.userInfo.name}\'s courses',
+                          'Student\'s list',
                           style: TextStyle(height: 1, fontSize: 25))
                         ),
                     Divider(
                       color: Colors.black,
                     ),
                     Expanded(
-                        child: FutureBuilder<List<CourseInfo>>(
-                          future: courses,
+                        child: FutureBuilder<List<StudentInfo>>(
+                          future: students,
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return _list(snapshot.data);
@@ -116,88 +110,86 @@ class _HomeState extends State<Home> {
                             // By default, show a loading spinner.
                             // return CircularProgressIndicator();
                             return Center(
-                              child: Text('There are no courses available yet!')
+                              child: Text('There are no students available yet!')
                             );
                           },
                         )),
                   ],
                 )),
-        drawer: DrawerMenu(userModel: widget.userModel, screen: 'Courses', notifyParent: widget.notifyParent),
-        floatingActionButton: Consumer<UserModel>(
-            //                  <--- Consumer
-            builder: (context, userModel, child) {
-          return Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
-                  child: Consumer<UserModel>(
-                //                  <--- Consumer
-                builder: (context, userModel, child) {
-                return FloatingActionButton.extended(
-                  heroTag: "logout_btn",
-                  onPressed: () {
-                    userModel.logout();
-                    setState(() {
-                      widget.notifyParent();
-                    });
-                  },
-                  icon: Icon(Icons.power_settings_new),
-                  label: Text('Logout',
-                      style: TextStyle(height: 1, fontSize: 25)),
-                );
-              })
-              )),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: new FloatingActionButton(
-                  heroTag: "add_course_btn",
-                  onPressed: () {
-                    if (!requesting) {
-                      requesting = true;
-                      model.addCourse(
-                        username: widget.userModel.userInfo.username,
-                        token: widget.userModel.userInfo.token,
-                        resultFunction: (val) {
-                          setState(() {
-                            courses = Future.value(model.courses);
-                          });
-                          requesting = false;
-                          return _ackAlert(
-                            context: context,
-                            title: 'SignIn',
-                            message: 'You have successfuly created a course!');
-                        },
-                        errorFunction: (error) {            
-                          requesting = false;
-                          return _ackAlert(
-                            context: context,
-                            title: 'Error',
-                            message: error.toString(),
-                            redirect: widget.userModel.tokenTimeout(error));
-                        },
-                        timeoutFunction: () {
-                          requesting = false;
-                          return _ackAlert(
-                            context: context,
-                            title: 'Error',
-                            message: 'Timeout > 10secs');
-                        }
-                      );
-                    }
-                  },
-                  tooltip: 'Add course',
-                  child: new Icon(Icons.add)
-                )
-              ),
-            ],
-          );
-        })));
+        drawer: DrawerMenu(userModel: widget.userModel, screen: 'Students', notifyParent: widget.notifyParent),
+        // floatingActionButton: Consumer<UserModel>(
+        //     //                  <--- Consumer
+        //     builder: (context, userModel, child) {
+        //   return Stack(
+        //     children: <Widget>[
+        //       Align(
+        //         alignment: Alignment.bottomLeft,
+        //         child: Container(
+        //           padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
+        //           child: Consumer<UserModel>(
+        //         //                  <--- Consumer
+        //         builder: (context, userModel, child) {
+        //         return FloatingActionButton.extended(
+        //           onPressed: () {
+        //             userModel.logout();
+        //             setState(() {
+        //               widget.notifyParent();
+        //             });
+        //           },
+        //           icon: Icon(Icons.power_settings_new),
+        //           label: Text('Logout',
+        //               style: TextStyle(height: 1, fontSize: 25)),
+        //         );
+        //       })
+        //       )),
+        //       Align(
+        //         alignment: Alignment.bottomRight,
+        //         child: new FloatingActionButton(
+        //           onPressed: () {
+        //             if (!requesting) {
+        //               requesting = true;
+        //               model.addStudent(
+        //                 username: widget.userModel.userInfo.username,
+        //                 token: widget.userModel.userInfo.token,
+        //                 resultFunction: (val) {
+        //                   setState(() {
+        //                     students = Future.value(model.students);
+        //                   });
+        //                   requesting = false;
+        //                   return _ackAlert(
+        //                     context: context,
+        //                     title: 'SignIn',
+        //                     message: 'You have successfuly created a course!');
+        //                 },
+        //                 errorFunction: (error) {
+        //                   requesting = false;
+        //                   return _ackAlert(
+        //                     context: context,
+        //                     title: 'Error',
+        //                     message: error.toString());
+        //                 },
+        //                 timeoutFunction: () {
+        //                   requesting = false;
+        //                   return _ackAlert(
+        //                     context: context,
+        //                     title: 'Error',
+        //                     message: 'Timeout > 10secs');
+        //                 }
+        //               );
+        //             }
+        //           },
+        //           tooltip: 'Add course',
+        //           child: new Icon(Icons.add)
+        //         )
+        //       ),
+        //     ],
+        //   );
+        // })
+        ));
   }
 
-  Widget _list(List<CourseInfo> courses) {
-    return courses.isEmpty ? Center(child: Text('There are no courses available yet!')
+  Widget _list(List<StudentInfo> courses) {
+    return courses.isEmpty ? Center(child: Text('There are no students available yet!')
       ) : ListView.builder(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
       itemCount: courses.length,
@@ -208,7 +200,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _item(CourseInfo element, int position) {
+  Widget _item(StudentInfo element, int position) {
     return Dismissible(
         background: _backgroundSlide(),
         key: UniqueKey(),
@@ -262,13 +254,13 @@ class _HomeState extends State<Home> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => CourseDetail(userModel: widget.userModel, courseId: '${element.id}', notifyParent: widget.notifyParent)),
+                        builder: (context) => StudentDetail(userModel: widget.userModel, studentId: '${element.id}', notifyParent: widget.notifyParent)),
                   );
                 },
                 child: ListTile(
                   leading: Icon(Icons.school, size: 50),
                   title: Text(element.name),
-                  subtitle: Text(element.professor),
+                  subtitle: Text(element.email),
                 ))));
   }
 

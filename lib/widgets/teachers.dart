@@ -1,36 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:login_flutter/base/base_model.dart';
 import 'package:login_flutter/base/base_view.dart';
-import 'package:login_flutter/models/course_info.dart';
-import 'package:login_flutter/viewmodels/home_view_model.dart';
-import 'package:login_flutter/widgets/course_detail.dart';
-import 'package:provider/provider.dart';
+import 'package:login_flutter/models/teacher_info.dart';
 import 'package:login_flutter/models/user_model.dart';
+import 'package:login_flutter/viewmodels/teacher_view_model.dart';
+import 'package:login_flutter/widgets/teacher_detail.dart';
 
 import 'drawer_menu.dart';
 
 GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class Home extends StatefulWidget {
+class Teachers extends StatefulWidget {
   final UserModel userModel;
   final Function() notifyParent;
 
-  Home({Key key, @required this.userModel, @required this.notifyParent})
+  Teachers({Key key, @required this.userModel, @required this.notifyParent})
       : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _StudentsState createState() => _StudentsState();
 }
 
-class _HomeState extends State<Home> {
+class _StudentsState extends State<Teachers> {
   bool requesting = false;
-  Future<List<CourseInfo>> courses;
-
-  @override
-  void initState() {
-    super.initState();
-    _scaffoldKey = new GlobalKey<ScaffoldState>();
-  }
+  Future<List<TeacherInfo>> teachers;
 
   void _ackAlert(
       {BuildContext context,
@@ -49,7 +42,8 @@ class _HomeState extends State<Home> {
               onPressed: () {
                 Navigator.of(context).pop();
                 if (redirect) {
-                  widget.notifyParent();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  widget.notifyParent();  
                 }
               },
             ),
@@ -61,13 +55,13 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<HomeViewModel>(
+    return BaseView<TeacherViewModel>(
         onModelReady: (model) { 
-          model.getCourses(
+          model.getTeachers(
             username: widget.userModel.userInfo.username,
             token: widget.userModel.userInfo.token,
             resultFunction: (val) {
-              courses = Future.value(model.courses);
+              teachers = Future.value(model.teachers);
             },
             errorFunction: (error) {
               return _ackAlert(
@@ -86,7 +80,7 @@ class _HomeState extends State<Home> {
         },
         builder: (context, model, child) => Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(title: Text('Home')),
+        appBar: AppBar(title: Text('Teachers')),
         body: model.state == ViewState.Busy
                 ? Center(child: CircularProgressIndicator())
                 : Container(
@@ -97,15 +91,15 @@ class _HomeState extends State<Home> {
                         alignment: Alignment.topCenter,
                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
                         child: Text(
-                          '${widget.userModel.userInfo.name}\'s courses',
+                          'Teacher\'s list',
                           style: TextStyle(height: 1, fontSize: 25))
                         ),
                     Divider(
                       color: Colors.black,
                     ),
                     Expanded(
-                        child: FutureBuilder<List<CourseInfo>>(
-                          future: courses,
+                        child: FutureBuilder<List<TeacherInfo>>(
+                          future: teachers,
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return _list(snapshot.data);
@@ -116,88 +110,89 @@ class _HomeState extends State<Home> {
                             // By default, show a loading spinner.
                             // return CircularProgressIndicator();
                             return Center(
-                              child: Text('There are no courses available yet!')
+                              child: Text('There are no teachers available yet!')
                             );
                           },
                         )),
                   ],
                 )),
-        drawer: DrawerMenu(userModel: widget.userModel, screen: 'Courses', notifyParent: widget.notifyParent),
-        floatingActionButton: Consumer<UserModel>(
-            //                  <--- Consumer
-            builder: (context, userModel, child) {
-          return Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
-                  child: Consumer<UserModel>(
-                //                  <--- Consumer
-                builder: (context, userModel, child) {
-                return FloatingActionButton.extended(
-                  heroTag: "logout_btn",
-                  onPressed: () {
-                    userModel.logout();
-                    setState(() {
-                      widget.notifyParent();
-                    });
-                  },
-                  icon: Icon(Icons.power_settings_new),
-                  label: Text('Logout',
-                      style: TextStyle(height: 1, fontSize: 25)),
-                );
-              })
-              )),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: new FloatingActionButton(
-                  heroTag: "add_course_btn",
-                  onPressed: () {
-                    if (!requesting) {
-                      requesting = true;
-                      model.addCourse(
-                        username: widget.userModel.userInfo.username,
-                        token: widget.userModel.userInfo.token,
-                        resultFunction: (val) {
-                          setState(() {
-                            courses = Future.value(model.courses);
-                          });
-                          requesting = false;
-                          return _ackAlert(
-                            context: context,
-                            title: 'SignIn',
-                            message: 'You have successfuly created a course!');
-                        },
-                        errorFunction: (error) {            
-                          requesting = false;
-                          return _ackAlert(
-                            context: context,
-                            title: 'Error',
-                            message: error.toString(),
-                            redirect: widget.userModel.tokenTimeout(error));
-                        },
-                        timeoutFunction: () {
-                          requesting = false;
-                          return _ackAlert(
-                            context: context,
-                            title: 'Error',
-                            message: 'Timeout > 10secs');
-                        }
-                      );
-                    }
-                  },
-                  tooltip: 'Add course',
-                  child: new Icon(Icons.add)
-                )
-              ),
-            ],
-          );
-        })));
+        drawer: DrawerMenu(userModel: widget.userModel, screen: 'Teachers', notifyParent: widget.notifyParent),
+        // floatingActionButton: Consumer<UserModel>(
+        //     //                  <--- Consumer
+        //     builder: (context, userModel, child) {
+        //   return Stack(
+        //     children: <Widget>[
+        //       Align(
+        //         alignment: Alignment.bottomLeft,
+        //         child: Container(
+        //           padding: EdgeInsets.symmetric(horizontal: 30, vertical: 1.5),
+        //           child: Consumer<UserModel>(
+        //         //                  <--- Consumer
+        //         builder: (context, userModel, child) {
+        //         return FloatingActionButton.extended(
+        //           onPressed: () {
+        //             userModel.logout();
+        //             setState(() {
+        //               widget.notifyParent();
+        //             });
+        //           },
+        //           icon: Icon(Icons.power_settings_new),
+        //           label: Text('Logout',
+        //               style: TextStyle(height: 1, fontSize: 25)),
+        //         );
+        //       })
+        //       )),
+        //       Align(
+        //         alignment: Alignment.bottomRight,
+        //         child: new FloatingActionButton(
+        //           onPressed: () {
+        //             if (!requesting) {
+        //               requesting = true;
+        //               debugPrint("HOLAAAAA");
+        //               model.addTeacher(
+        //                 username: widget.userModel.userInfo.username,
+        //                 token: widget.userModel.userInfo.token,
+        //                 resultFunction: (val) {
+        //                   setState(() {
+        //                     teacher = Future.value(model.teachers);
+        //                   });
+        //                   requesting = false;
+        //                   return _ackAlert(
+        //                     context: context,
+        //                     title: 'SignIn',
+        //                     message: 'You have successfuly created a course!');
+        //                 },
+        //                 errorFunction: (error) {
+        //                   debugPrint("HOLAAAAA");
+        //                   requesting = false;
+        //                   return _ackAlert(
+        //                     context: context,
+        //                     title: 'Error',
+        //                     message: error.toString());
+        //                 },
+        //                 timeoutFunction: () {
+        //                   debugPrint("HOLAAAAA");
+        //                   requesting = false;
+        //                   return _ackAlert(
+        //                     context: context,
+        //                     title: 'Error',
+        //                     message: 'Timeout > 10secs');
+        //                 }
+        //               );
+        //             }
+        //           },
+        //           tooltip: 'Add course',
+        //           child: new Icon(Icons.add)
+        //         )
+        //       ),
+        //     ],
+        //   );
+        // })
+        ));
   }
 
-  Widget _list(List<CourseInfo> courses) {
-    return courses.isEmpty ? Center(child: Text('There are no courses available yet!')
+  Widget _list(List<TeacherInfo> courses) {
+    return courses.isEmpty ? Center(child: Text('There are no teachers available yet!')
       ) : ListView.builder(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
       itemCount: courses.length,
@@ -208,7 +203,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _item(CourseInfo element, int position) {
+  Widget _item(TeacherInfo element, int position) {
     return Dismissible(
         background: _backgroundSlide(),
         key: UniqueKey(),
@@ -236,7 +231,7 @@ class _HomeState extends State<Home> {
                           style: TextStyle(color: Colors.red),
                         ),
                         onPressed: () {
-                          // There is not an actual endpoint to desroy a course!...
+                          // There is not an actual endpoint to destroy a course!...
                           setState(() {
                             // courses.data.removeAt(position);
                           });
@@ -262,13 +257,13 @@ class _HomeState extends State<Home> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => CourseDetail(userModel: widget.userModel, courseId: '${element.id}', notifyParent: widget.notifyParent)),
+                        builder: (context) => TeacherDetail(userModel: widget.userModel, teacherId: '${element.id}', notifyParent: widget.notifyParent)),
                   );
                 },
                 child: ListTile(
                   leading: Icon(Icons.school, size: 50),
                   title: Text(element.name),
-                  subtitle: Text(element.professor),
+                  subtitle: Text(element.email),
                 ))));
   }
 

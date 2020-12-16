@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:login_flutter/base/base_model.dart';
+import 'package:login_flutter/base/base_view.dart';
+import 'package:login_flutter/viewmodels/signup_view_model.dart';
 import 'package:login_flutter/models/user_model.dart';
+
+GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class SignUp extends StatelessWidget {
   final UserModel userModel;
@@ -9,16 +13,24 @@ class SignUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BaseView<SignUpViewModel>(
+        builder: (context, model, child) => Scaffold(
+        key: _scaffoldKey,
         appBar: new AppBar(title: Text("SignUp")),
-        body: Container(
+        body: model.state == ViewState.Busy
+            ? Center(child: CircularProgressIndicator())
+            : Container(
             margin: const EdgeInsets.all(16),
             alignment: Alignment.center,
-            child: SignUpForm()));
+            child: SignUpForm(model: model))));
   }
 }
 
 class SignUpForm extends StatefulWidget {
+  final SignUpViewModel model;
+
+  SignUpForm({Key key, @required this.model}) : super(key: key);
+
   @override
   SignUpFormState createState() {
     return SignUpFormState();
@@ -168,59 +180,57 @@ class SignUpFormState extends State<SignUpForm> {
                   })),
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Consumer<UserModel>(
-                  //                  <--- Consumer
-                  builder: (context, userModel, child) {
-                return RaisedButton(
+              child: RaisedButton(
                   onPressed: () {
                     if (!_requesting &&
                         _formKey.currentState.validate() &&
                         _password == _confirmPassword) {
                       _requesting = true;
-                      //Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
-                      userModel
-                          .signUpRequest(
-                              email: _email,
-                              password: _password,
-                              username: _username,
-                              name: _name)
-                          .then((user) {
-                        _requesting = false;
-                        return _ackAlert(
-                            context: context,
+                      widget.model.signUp(
+                        email: _email,
+                        password: _password,
+                        username: _username,
+                        name: _name,
+                        resultFunction: () {
+                          debugPrint('IM THE FIRST MOTHER FUCKER ALIVE ON EARTH!');
+                          _requesting = false;
+                          return _ackAlert(
+                            context: _scaffoldKey.currentContext,
                             title: 'SignUp',
                             message:
                                 'You have successfuly SignUp! and you are going to be redirected',
                             redirect: true);
-                      }).catchError((error) {
-                        _requesting = false;
-                        return _ackAlert(
-                            context: context,
+                        },
+                        errorFunction: (error) {
+                          _requesting = false;
+                          return _ackAlert(
+                            context: _scaffoldKey.currentContext,
                             title: 'Error',
                             message: error.toString());
-                      }).timeout(Duration(seconds: 10), onTimeout: () {
-                        _requesting = false;
-                        return _ackAlert(
-                            context: context,
+                            // Code to restore the previous wrong form.. 
+                            // TextFields need controllers...
+                        },
+                        timeoutFunction: () {
+                          _requesting = false;
+                          return _ackAlert(
+                            context: _scaffoldKey.currentContext,
                             title: 'Error',
                             message: 'Timeout > 10secs');
-                      });
+                            // Code to restore the previous wrong form.. 
+                            // TextFields need controllers...
+                        }
+                      );
                     }
                   },
                   child:
                       Text('Submit', style: TextStyle(height: 1, fontSize: 25)),
                   textColor: Colors.white,
                   color: Colors.blue,
-                );
-              })),
+              )),
           Container(
               alignment: Alignment.center,
               child: FlatButton(
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => MainPage()),
-                  // );
                   Navigator.pop(context);
                 },
                 child:
